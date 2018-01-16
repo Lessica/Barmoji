@@ -10,7 +10,10 @@ Barmoji is not currently available on a Cydia repo yet. When Cydia is updated to
 
 ### Changelog
 
-1.0
+1.0 Beta 2
+ - Fix Barmoji being displayed when the keyboard is initially displayed in landscape.
+
+1.0 Beta 1
  - Initial Release
 
 ### Compiling
