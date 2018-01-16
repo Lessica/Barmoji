@@ -6,7 +6,7 @@ This is how Apple should have used the extra space on the iPhone X keyboard inst
 
 ### Installing
 
-Barmoji is not currently available on a Cydia repo yet. When Cydia is updated to support iOS 11 I'll submit to BigBoss as usual. For now, if you're feeling adventourous, use the dylib provided in the release tab with Electra.
+Barmoji is not currently available on a Cydia repo yet. When Cydia is updated to support iOS 11 I'll submit to BigBoss as usual. For now, if you're feeling adventourous, use the dylib provided in the [Barmoji.zip](https://github.com/CPDigitalDarkroom/Barmoji/releases) with Electra.
 
 ### Changelog
 
