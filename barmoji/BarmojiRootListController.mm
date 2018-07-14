@@ -7,6 +7,7 @@
 //
 
 #import "BarmojiPreferences.h"
+#include <spawn.h>
 
 @interface BarmojiRootListController : PSListController <MFMailComposeViewControllerDelegate>
 @end
@@ -33,6 +34,10 @@
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji.settings" forKey:@"PostNotification"];
     setKeyForSpec(@"BarmojiFeedbackType");
     [specifier setValues:[self activationTypeValues] titles:[self activationTypeTitles] shortTitles:[self activationTypeShortTitles]];
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = buttonCellWithName(@"Respring");
+    specifier->action = @selector(respring);
     [mutableSpecifiers addObject:specifier];
 
     specifier = groupSpecifier(@"Support");
@@ -111,6 +116,14 @@
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
   [self dismissViewControllerAnimated: YES completion: nil];
+}
+
+- (void)respring {
+  pid_t pid;
+  int status;
+  const char* args[] = {"killall", "-9", "backboardd", NULL};
+  posix_spawn(&pid, "/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
+  waitpid(pid, &status, WEXITED);
 }
 
 @end
