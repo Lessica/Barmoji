@@ -10,4 +10,6 @@
 
 @interface BarmojiCollectionView : UICollectionView
 
+@property (assign, nonatomic) int feedbackType;
+
 @end

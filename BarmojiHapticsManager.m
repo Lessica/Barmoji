@@ -31,8 +31,7 @@
     return self;
 }
 
-- (void)actuateHaptics {
-    int feedbackType = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiFeedbackType"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+- (void)actuateHapticsForType:(int)feedbackType {
 
     if(feedbackType == 1) {
         [self handleHapticFeedbackForSelection];

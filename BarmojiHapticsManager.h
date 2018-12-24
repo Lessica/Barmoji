@@ -13,16 +13,6 @@
 
 + (instancetype)sharedManager;
 
-- (void)actuateHaptics;
-
-- (void)handleHapticFeedbackForImpactStyle:(UIImpactFeedbackStyle)style ;
-
-- (void)handleHapticFeedbackForError;
-
-- (void)handleHapticFeedbackForSelection;
-
-- (void)handleHapticFeedbackForSuccess;
-
-- (void)handleHapticFeedbackForWarning;
+- (void)actuateHapticsForType:(int)feedbackType;
 
 @end

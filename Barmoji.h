@@ -8,6 +8,15 @@
 
 #define kPrefDomain "com.cpdigitaldarkroom.barmoji"
 
+@interface EMFEmojiToken : NSObject
+@property (nonatomic,copy) NSString * string;
+@end
+
+@interface EMFEmojiPreferences : NSObject
+-(NSArray *)allRecents;
+-(NSArray *)recentEmojis;
+@end
+
 @interface UIKeyboardImpl : UIView
 
 +(id)activeInstance;
@@ -16,6 +25,7 @@
 
 @interface UIKeyboardEmoji
 @property (nonatomic,retain) NSString* emojiString;
++(id)emojiWithString:(id)arg1 withVariantMask:(unsigned long long)arg2 ;
 @end
 
 @interface UIKeyboardEmojiCollectionViewCell : UICollectionViewCell
@@ -28,6 +38,10 @@
 @end
 
 @class BarmojiCollectionView;
+@interface UIKeyboardPredictionView : UIView
+@property (nonatomic,retain) BarmojiCollectionView* barmoji;
+@end
+
 @interface UIKeyboardDockView : UIView
 @property (nonatomic,retain) BarmojiCollectionView* barmoji;
 @end

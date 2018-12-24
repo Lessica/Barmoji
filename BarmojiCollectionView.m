@@ -13,6 +13,7 @@
 @interface BarmojiCollectionView () <UICollectionViewDataSource, UICollectionViewDelegate>
 
 @property (strong, nonatomic) UIKeyboardEmojiKeyDisplayController *emojiManager;
+@property (strong, nonatomic) NSArray *recentEmojis;
 
 @end
 
@@ -21,7 +22,10 @@
 
 - (instancetype)init {
 
-	self.emojiManager = [[NSClassFromString(@"UIKeyboardEmojiKeyDisplayController") alloc] init];
+    EMFEmojiPreferences *emojiPrefs = [[NSClassFromString(@"EMFEmojiPreferences") alloc] init];
+    self.recentEmojis = [emojiPrefs recentEmojis];
+
+	//self.emojiManager = [[NSClassFromString(@"UIKeyboardEmojiKeyDisplayController") alloc] init];
 
 	UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
@@ -44,15 +48,16 @@
 #pragma mark - UICollectionViewDelegate
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-
     UIKeyboardEmojiCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"EmojiKey" forIndexPath:indexPath];
-    cell.emoji = [self.emojiManager recents][indexPath.row];
+
+    EMFEmojiToken *emojiToken = self.recentEmojis[indexPath.row];
+    cell.emoji = [UIKeyboardEmoji emojiWithString:emojiToken.string withVariantMask:0];
     cell.emojiFontSize = 26;
     return cell;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return [self.emojiManager recents].count;
+    return self.recentEmojis.count;//[self.emojiManager recents].count;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -61,8 +66,11 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 
-    [[BarmojiHapticsManager sharedManager] actuateHaptics];
-    UIKeyboardEmoji *pressedEmoji = [self.emojiManager recents][indexPath.row];
+    if(self.feedbackType != 7) {
+        [[BarmojiHapticsManager sharedManager] actuateHapticsForType:self.feedbackType];
+    }
+    EMFEmojiToken *emojiToken = self.recentEmojis[indexPath.row];
+    UIKeyboardEmoji *pressedEmoji = [UIKeyboardEmoji emojiWithString:emojiToken.string withVariantMask:0];
     [[NSClassFromString(@"UIKeyboardImpl") activeInstance] insertText:pressedEmoji.emojiString];
 }
 

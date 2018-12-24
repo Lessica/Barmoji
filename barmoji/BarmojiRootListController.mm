@@ -9,6 +9,8 @@
 #import "BarmojiPreferences.h"
 #include <spawn.h>
 
+extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void);
+
 @interface BarmojiRootListController : PSListController <MFMailComposeViewControllerDelegate>
 @end
 
@@ -20,20 +22,48 @@
     NSMutableArray *mutableSpecifiers = [NSMutableArray new];
     PSSpecifier *specifier;
 
-    specifier = groupSpecifier(@"Haptic Feedback");
+    specifier = groupSpecifier(@"");
     [mutableSpecifiers addObject:specifier];
 
     specifier = subtitleSwitchCellWithName(@"Enabled");
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
-    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji.settings" forKey:@"PostNotification"];
     setKeyForSpec(@"BarmojiEnabled");
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = groupSpecifier(@"Accessibility");
+    setFooterForSpec(@"Enabling this option will disable the home gesture while the keyboard is presented.");
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = subtitleSwitchCellWithName(@"Disable Home Gesture");
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setKeyForSpec(@"BarmojiDisablesGesture");
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = groupSpecifier(@"Locations");
+    setFooterForSpec(@"Bottom Bar: The default Barmoji implementation for iPhone X or devices who have enabled the iPhone X layout. \n\nReplace Predictive Bar: Replaces the text prediction bar with Barmoji, useful for non-iPhone X devices");
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = subtitleSwitchCellWithName(@"Bottom Bar");
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setKeyForSpec(@"BarmojiBottomEnabled");
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = subtitleSwitchCellWithName(@"Replace Predictive Bar");
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setKeyForSpec(@"BarmojiPredictiveEnabled");
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = groupSpecifier(@"Haptic Feedback");
     [mutableSpecifiers addObject:specifier];
 
     specifier = [PSSpecifier preferenceSpecifierNamed:@"Feedback Type" target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
-    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji.settings" forKey:@"PostNotification"];
     setKeyForSpec(@"BarmojiFeedbackType");
     [specifier setValues:[self activationTypeValues] titles:[self activationTypeTitles] shortTitles:[self activationTypeShortTitles]];
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = groupSpecifier(@"");
+    setFooterForSpec(@"A respring is required to fully apply setting changes");
     [mutableSpecifiers addObject:specifier];
 
     specifier = buttonCellWithName(@"Respring");
@@ -56,6 +86,7 @@
 
 - (NSArray *)activationTypeShortTitles {
   return @[
+    @"None",
     @"Extra Light",
     @"Light",
     @"Medium",
@@ -67,6 +98,7 @@
 
 - (NSArray *)activationTypeTitles {
   return @[
+    @"None",
     @"Extra Light",
     @"Light",
     @"Medium",
@@ -78,7 +110,7 @@
 
 - (NSArray *)activationTypeValues {
   return @[
-    @1, @2, @3, @4, @5, @6
+    @7, @1, @2, @3, @4, @5, @6
   ];
 }
 
@@ -116,6 +148,24 @@
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
   [self dismissViewControllerAnimated: YES completion: nil];
+}
+
+-(void)setPreferenceValue:(id)value specifier:(PSSpecifier*)specifier {
+
+  [super setPreferenceValue:value specifier:specifier];
+
+  int feedbackType = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiFeedbackType"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+  BOOL bottom = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiBottomEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
+  BOOL enabled = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
+  BOOL predictive = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiPredictiveEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
+
+  CFMutableDictionaryRef dictionary = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+  CFDictionaryAddValue(dictionary, @"feedbackType", CFBridgingRetain([NSNumber numberWithInt:feedbackType]));
+  CFDictionaryAddValue(dictionary, @"bottom", CFBridgingRetain([NSNumber numberWithBool:bottom]));
+  CFDictionaryAddValue(dictionary, @"enabled", CFBridgingRetain([NSNumber numberWithBool:enabled]));
+  CFDictionaryAddValue(dictionary, @"predictive", CFBridgingRetain([NSNumber numberWithBool:predictive]));
+  CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(), CFSTR("com.cpdigitaldarkroom.barmoji.settings"), nil, dictionary, true);
+  CFRelease(dictionary);
 }
 
 - (void)respring {
