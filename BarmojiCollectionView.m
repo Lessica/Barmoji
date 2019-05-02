@@ -12,20 +12,38 @@
 
 @interface BarmojiCollectionView () <UICollectionViewDataSource, UICollectionViewDelegate>
 
+@property (assign, nonatomic) BOOL useCustomEmojis;
+
+@property (strong, nonatomic) NSArray *customEmojis;
+
 @property (strong, nonatomic) UIKeyboardEmojiKeyDisplayController *emojiManager;
-@property (strong, nonatomic) NSArray *recentEmojis;
 
 @end
-
 
 @implementation BarmojiCollectionView
 
 - (instancetype)init {
+    
+    NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/private/var/mobile/Library/Preferences/com.cpdigitaldarkroom.barmoji.plist"];
+    int emojiSource = ([prefs objectForKey:@"EmojiSource"] ? [[prefs objectForKey:@"EmojiSource"] intValue] : 1);
 
-    EMFEmojiPreferences *emojiPrefs = [[NSClassFromString(@"EMFEmojiPreferences") alloc] init];
-    self.recentEmojis = [emojiPrefs recentEmojis];
+    _useCustomEmojis = (emojiSource == 2);
 
-	//self.emojiManager = [[NSClassFromString(@"UIKeyboardEmojiKeyDisplayController") alloc] init];
+    if(_useCustomEmojis) {
+        NSString *emojiString = ([prefs objectForKey:@"CustomEmojis"] ? [prefs objectForKey:@"CustomEmojis"] : @"");
+
+        NSMutableArray *emojis = [NSMutableArray new]; 
+        
+        [emojiString enumerateSubstringsInRange:NSMakeRange(0, emojiString.length)
+        options:NSStringEnumerationByComposedCharacterSequences
+        usingBlock:^(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *stop) {
+            [emojis addObject:substring];
+        }];
+        self.customEmojis = emojis;
+
+    } else {
+        self.emojiManager = [[NSClassFromString(@"UIKeyboardEmojiKeyDisplayController") alloc] init];
+    }
 
 	UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
@@ -50,14 +68,20 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     UIKeyboardEmojiCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"EmojiKey" forIndexPath:indexPath];
 
-    EMFEmojiToken *emojiToken = self.recentEmojis[indexPath.row];
-    cell.emoji = [UIKeyboardEmoji emojiWithString:emojiToken.string withVariantMask:0];
+    if(_useCustomEmojis) {
+        NSString *emojiString = self.customEmojis[indexPath.row];
+        cell.emoji = [UIKeyboardEmoji emojiWithString:emojiString withVariantMask:0];
+    } else {
+        cell.emoji = [self.emojiManager recents][indexPath.row];
+    }
+    
     cell.emojiFontSize = 26;
     return cell;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.recentEmojis.count;//[self.emojiManager recents].count;
+    int count =  _useCustomEmojis ? self.customEmojis.count : [self.emojiManager recents].count;
+    return count;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -69,8 +93,15 @@
     if(self.feedbackType != 7) {
         [[BarmojiHapticsManager sharedManager] actuateHapticsForType:self.feedbackType];
     }
-    EMFEmojiToken *emojiToken = self.recentEmojis[indexPath.row];
-    UIKeyboardEmoji *pressedEmoji = [UIKeyboardEmoji emojiWithString:emojiToken.string withVariantMask:0];
+    
+    UIKeyboardEmoji *pressedEmoji;
+    if(_useCustomEmojis) {
+        NSString *emojiString = self.customEmojis[indexPath.row];
+        pressedEmoji = [UIKeyboardEmoji emojiWithString:emojiString withVariantMask:0];
+    } else {
+        pressedEmoji = [self.emojiManager recents][indexPath.row];
+    }
+
     [[NSClassFromString(@"UIKeyboardImpl") activeInstance] insertText:pressedEmoji.emojiString];
 }
 

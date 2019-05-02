@@ -12,9 +12,35 @@
 extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void);
 
 @interface BarmojiRootListController : PSListController <MFMailComposeViewControllerDelegate>
+
+@property (strong, nonatomic) NSMutableArray *dynamicSpecs;
+
 @end
 
 @implementation BarmojiRootListController
+
+- (instancetype)init {
+  if(self = [super init]) {
+    [self createDynamicSpecs];
+  }
+  return self;
+}
+
+- (void)createDynamicSpecs {
+  PSSpecifier *specifier;
+  _dynamicSpecs = [NSMutableArray new];
+
+  specifier = groupSpecifier(@"");
+  [_dynamicSpecs addObject:specifier];
+
+  specifier = textEditCellWithName(@"Emojis:");
+  setClassForSpec(NSClassFromString(@"BarmojiEditableTextCell"));
+  [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+  setDefaultForSpec(@"");
+  setPlaceholderForSpec(@"Your Favorite Emojis");
+  setKeyForSpec(@"CustomEmojis");
+  [_dynamicSpecs addObject:specifier];
+}
 
 -(id)specifiers {
   if(_specifiers == nil) {
@@ -30,14 +56,22 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
     setKeyForSpec(@"BarmojiEnabled");
     [mutableSpecifiers addObject:specifier];
 
-    specifier = groupSpecifier(@"Accessibility");
-    setFooterForSpec(@"Enabling this option will disable the home gesture while the keyboard is presented.");
+    specifier = groupSpecifier(@"Shown Emojis");
     [mutableSpecifiers addObject:specifier];
 
-    specifier = subtitleSwitchCellWithName(@"Disable Home Gesture");
+    specifier = segmentCellWithName(@"Shown Emojis");
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
-    setKeyForSpec(@"BarmojiDisablesGesture");
-    [mutableSpecifiers addObject:specifier];
+    [specifier setValues:@[@(1), @(2)] titles:@[@"Recent", @"Custom"]];
+    setDefaultForSpec(@1);
+		setKeyForSpec(@"EmojiSource");
+		[mutableSpecifiers addObject:specifier];
+
+    int sourceType = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("EmojiSource"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+    if(sourceType == 2) {
+      for(PSSpecifier *sp in _dynamicSpecs) {
+        [mutableSpecifiers addObject:sp];
+      }
+    }
 
     specifier = groupSpecifier(@"Locations");
     setFooterForSpec(@"Bottom Bar: The default Barmoji implementation for iPhone X or devices who have enabled the iPhone X layout. \n\nReplace Predictive Bar: Replaces the text prediction bar with Barmoji, useful for non-iPhone X devices");
@@ -151,8 +185,16 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 }
 
 -(void)setPreferenceValue:(id)value specifier:(PSSpecifier*)specifier {
-
+  
   [super setPreferenceValue:value specifier:specifier];
+
+  NSDictionary *properties = specifier.properties;
+  NSString *key = properties[@"key"];
+
+  if([key isEqualToString:@"EmojiSource"]) {
+    BOOL shouldShow = [value intValue] == 2;
+    [self shouldShowCustomEmojiSpecifiers:shouldShow];
+  }
 
   int feedbackType = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiFeedbackType"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
   BOOL bottom = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiBottomEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
@@ -166,6 +208,14 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
   CFDictionaryAddValue(dictionary, @"predictive", CFBridgingRetain([NSNumber numberWithBool:predictive]));
   CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(), CFSTR("com.cpdigitaldarkroom.barmoji.settings"), nil, dictionary, true);
   CFRelease(dictionary);
+}
+
+- (void)shouldShowCustomEmojiSpecifiers:(BOOL)show {
+  if(show) {
+    [self insertContiguousSpecifiers:_dynamicSpecs afterSpecifierID:@"EmojiSource" animated:YES];
+  } else {
+    [self removeContiguousSpecifiers:_dynamicSpecs animated:YES];
+  }
 }
 
 - (void)respring {

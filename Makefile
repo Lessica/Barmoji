@@ -1,5 +1,5 @@
-TARGET = :clang
-ARCHS = arm64
+TARGET = :clang:11.2:7.0
+ARCHS = arm64 arm64e
 FINALPACKAGE = 1
 
 include $(THEOS)/makefiles/common.mk

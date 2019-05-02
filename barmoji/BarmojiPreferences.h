@@ -35,6 +35,11 @@
 #define subtitleSwitchCellWithName(name) [PSSpecifier preferenceSpecifierNamed:name target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NULL cell:PSSwitchCell edit:Nil]
 #define switchCellWithName(name) [PSSpecifier preferenceSpecifierNamed:name target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NULL cell:PSSwitchCell edit:Nil]
 #define textCellWithName(name) [PSSpecifier preferenceSpecifierNamed:name target:self set:NULL get:NULL detail:NULL cell:PSStaticTextCell edit:Nil]
+#define textEditCellWithName(name) [PSSpecifier preferenceSpecifierNamed:name target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NULL cell:PSEditTextCell edit:Nil]
+#define segmentCellWithName(name) [PSSpecifier preferenceSpecifierNamed:name target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NULL cell:PSSegmentCell edit:Nil]
+#define setDefaultForSpec(sDefault) [specifier setProperty:sDefault forKey:@"default"]
+#define setClassForSpec(className) [specifier setProperty:className forKey:@"cellClass"]
+#define setPlaceholderForSpec(placeholder) [specifier setProperty:placeholder forKey:@"placeholder"]
 
 #define setKeyForSpec(key) [specifier setProperty:key forKey:@"key"]
 #define setFooterForSpec(footer) [specifier setProperty:footer forKey:@"footerText"]

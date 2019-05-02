@@ -11,12 +11,11 @@
 
 extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void);
 
+%group main
+
 BOOL barmojiBottomEnabled = NO;
 BOOL barmojiEnabled = NO;
 BOOL barmojiPredictiveEnabled = NO;
-BOOL barmojiPreventsHomeGesture = NO;
-
-BOOL preventHomeGesture = NO;
 
 int barmojiFeedbackType = 7;
 
@@ -24,24 +23,12 @@ int barmojiFeedbackType = 7;
 
 - (void)viewDidDisappear:(BOOL)animated {
 	%orig;
-	NSLog(@"Did Disappear");
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
-
-	if(barmojiPreventsHomeGesture) {
-		NSLog(@"Disable prevents gesture");
-		preventHomeGesture = NO;
-	}
 }
 
 - (void)viewDidAppear:(BOOL)animated {
 	%orig;
-	NSLog(@"Did appear");
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(barmojiRotationUpdate:) name:UIDeviceOrientationDidChangeNotification object:nil];
-
-	if(barmojiPreventsHomeGesture) {
-		NSLog(@"Set prevents gesture");
-		preventHomeGesture = YES;
-	}
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -90,7 +77,7 @@ int barmojiFeedbackType = 7;
 	%orig;
 }
 
--(void)_setPredictions:(id)arg1 autocorrection:(id)arg2 emojiList:(id)arg3 {
+-(void)_setPredictions:(NSArray *)arg1 autocorrection:(id)arg2 emojiList:(id)arg3 {
 	if(barmojiEnabled && barmojiPredictiveEnabled) {
 		return;
 	}
@@ -102,12 +89,10 @@ int barmojiFeedbackType = 7;
 %property (retain, nonatomic) BarmojiCollectionView *barmoji;
 
 - (instancetype)initWithFrame:(CGRect)frame {
-
 	UIKeyboardDockView *dockView = %orig;
 	if(dockView) {
 
 		if(barmojiEnabled && barmojiBottomEnabled) {
-
 			self.barmoji = [[BarmojiCollectionView alloc] init];
 			self.barmoji.feedbackType = barmojiFeedbackType;
 			self.barmoji.translatesAutoresizingMaskIntoConstraints = NO;
@@ -123,18 +108,6 @@ int barmojiFeedbackType = 7;
 }
 
 %end
-
-%hook SBHomeGestureSettings
-
--(BOOL)isHomeGestureEnabled {
-	NSLog(@"Reading From Here");
-	if(barmojiPreventsHomeGesture) {
-		NSLog(@"Prevents Gesture: %@", preventHomeGesture ? @"YES" : @"NO");
-		return preventHomeGesture;
-	}
-	return %orig;
-}
-
 %end
 
 static void loadPrefs() {
@@ -143,8 +116,6 @@ static void loadPrefs() {
 	barmojiEnabled = ([prefs objectForKey:@"BarmojiEnabled"] ? [[prefs objectForKey:@"BarmojiEnabled"] boolValue] : NO);
 	barmojiFeedbackType = ([prefs objectForKey:@"BarmojiFeedbackType"] ? [[prefs objectForKey:@"BarmojiFeedbackType"] intValue] : 7);
 	barmojiPredictiveEnabled = ([prefs objectForKey:@"BarmojiPredictiveEnabled"] ? [[prefs objectForKey:@"BarmojiPredictiveEnabled"] boolValue] : NO);
-	barmojiPreventsHomeGesture = ([prefs objectForKey:@"BarmojiDisablesGesture"] ? [[prefs objectForKey:@"BarmojiDisablesGesture"] boolValue] : NO);
-    [prefs release];
 }
 
 static void updateSettings(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
@@ -159,6 +130,25 @@ static void updateSettings(CFNotificationCenterRef center, void *observer, CFStr
 }
 
 %ctor {
-	loadPrefs();
-	CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(), NULL, updateSettings, CFSTR("com.cpdigitaldarkroom.barmoji.settings"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+	@autoreleasepool {
+
+    // check if process is springboard or an application
+    // this prevents our tweak from running in non-application (with UI)
+    // processes and also prevents bad behaving tweaks to invoke our tweak
+
+    NSArray *args = [[NSClassFromString(@"NSProcessInfo") processInfo] arguments];
+    if (args.count != 0) {
+      NSString *executablePath = args[0];
+      if (executablePath) {
+        NSString *processName = [executablePath lastPathComponent];
+        BOOL isSpringBoard = [processName isEqualToString:@"SpringBoard"];
+        BOOL isApplication = [executablePath rangeOfString:@"/Application"].location != NSNotFound;
+        if (isSpringBoard || isApplication) {
+          loadPrefs();
+					CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(), NULL, updateSettings, CFSTR("com.cpdigitaldarkroom.barmoji.settings"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+					%init(main);
+        }
+      }
+    }
+  }
 }
