@@ -33,12 +33,14 @@ int barmojiFeedbackType = 7;
 
 - (void)viewWillAppear:(BOOL)animated {
 	%orig;
-	self.dockView.barmoji.alpha = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation) ? 0 : 1;
+	UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+	self.dockView.barmoji.alpha = UIDeviceOrientationIsLandscape(orientation) ? 0 : 1;
 }
 
 %new
 - (void)barmojiRotationUpdate:(NSNotification *)notification {
-	self.dockView.barmoji.alpha = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation) ? 0 : 1;
+	UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+	self.dockView.barmoji.alpha = UIDeviceOrientationIsLandscape(orientation) ? 0 : 1;
 }
 
 %end
@@ -56,8 +58,8 @@ int barmojiFeedbackType = 7;
 			self.barmoji.translatesAutoresizingMaskIntoConstraints = NO;
 			[predictionView addSubview:self.barmoji];
 
-			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:predictionView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0]];
-			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:predictionView attribute:NSLayoutAttributeRight multiplier:1.0 constant:0]];
+			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:predictionView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0]];
+			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:predictionView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0]];
 			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:40]];
 			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:predictionView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0]];
 		}
@@ -98,10 +100,10 @@ int barmojiFeedbackType = 7;
 			self.barmoji.translatesAutoresizingMaskIntoConstraints = NO;
 			[dockView addSubview:self.barmoji];
 
-			[dockView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:dockView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:60]];
-			[dockView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:dockView attribute:NSLayoutAttributeRight multiplier:1.0 constant:-50]];
+			[dockView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:dockView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:60]];
+			[dockView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:dockView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:-50]];
 			[dockView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:40]];
-			[dockView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:dockView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:-22]];
+			[dockView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:dockView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:-20]];
 		}
 	}
 	return dockView;
