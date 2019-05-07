@@ -96,6 +96,15 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
     [specifier setValues:[self activationTypeValues] titles:[self activationTypeTitles] shortTitles:[self activationTypeShortTitles]];
     [mutableSpecifiers addObject:specifier];
 
+    specifier = groupSpecifier(@"Layout");
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = [PSSpecifier preferenceSpecifierNamed:@"Scroll Direction" target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setKeyForSpec(@"BarmojiScrollDirection");
+    [specifier setValues:[self scrollDirectionValues] titles:[self scrollDirectionTitles] shortTitles:[self scrollDirectionShortTitles]];
+    [mutableSpecifiers addObject:specifier];
+
     specifier = groupSpecifier(@"");
     setFooterForSpec(@"A respring is required to fully apply setting changes");
     [mutableSpecifiers addObject:specifier];
@@ -145,6 +154,22 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 - (NSArray *)activationTypeValues {
   return @[
     @7, @1, @2, @3, @4, @5, @6
+  ];
+}
+
+- (NSArray *)scrollDirectionShortTitles {
+  return [self scrollDirectionTitles];
+}
+
+- (NSArray *)scrollDirectionTitles {
+  return @[
+    @"Horizontal", @"Vertical"
+  ];
+}
+
+- (NSArray *)scrollDirectionValues {
+  return @[
+    @(UICollectionViewScrollDirectionHorizontal), @(UICollectionViewScrollDirectionVertical)
   ];
 }
 

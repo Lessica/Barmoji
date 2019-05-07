@@ -12,6 +12,7 @@
 
 @interface BarmojiCollectionView () <UICollectionViewDataSource, UICollectionViewDelegate>
 
+@property (assign, nonatomic) UICollectionViewScrollDirection direction;
 @property (assign, nonatomic) BOOL replacesPredictiveBar;
 @property (assign, nonatomic) BOOL useCustomEmojis;
 @property (strong, nonatomic) NSArray *customEmojis;
@@ -26,7 +27,7 @@
     
     NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/private/var/mobile/Library/Preferences/com.cpdigitaldarkroom.barmoji.plist"];
     int emojiSource = ([prefs objectForKey:@"EmojiSource"] ? [[prefs objectForKey:@"EmojiSource"] intValue] : 1);
-
+    _direction = ([[prefs objectForKey:@"BarmojiScrollDirection"] ?: @(UICollectionViewScrollDirectionHorizontal) integerValue]);
     _replacesPredictiveBar = ([prefs objectForKey:@"BarmojiPredictiveEnabled"] ? [[prefs objectForKey:@"BarmojiPredictiveEnabled"] boolValue] : NO);
     _useCustomEmojis = (emojiSource == 2);
 
@@ -47,7 +48,7 @@
     }
 
 	UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+    flowLayout.scrollDirection = self.direction;
     flowLayout.minimumInteritemSpacing = 0;
     flowLayout.minimumLineSpacing = 0;
 
@@ -55,6 +56,7 @@
 
         self.delegate = self;
         self.dataSource = self;
+        self.showsVerticalScrollIndicator = NO;
         self.showsHorizontalScrollIndicator = NO;
         self.pagingEnabled = YES;
         [self registerClass:NSClassFromString(@"UIKeyboardEmojiCollectionViewCell") forCellWithReuseIdentifier:@"EmojiKey"];
