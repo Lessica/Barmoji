@@ -6,6 +6,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = Barmoji
 Barmoji_FILES = Barmoji.xm $(wildcard *.m)
+Barmoji_CFLAGS += -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
