@@ -19,32 +19,6 @@ BOOL barmojiPredictiveEnabled = NO;
 
 int barmojiFeedbackType = 7;
 
-%hook UISystemKeyboardDockController
-
-- (void)viewDidDisappear:(BOOL)animated {
-	%orig;
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-	%orig;
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(barmojiRotationUpdate:) name:UIDeviceOrientationDidChangeNotification object:nil];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-	%orig;
-	UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-	self.dockView.barmoji.alpha = UIDeviceOrientationIsLandscape(orientation) ? 0 : 1;
-}
-
-%new
-- (void)barmojiRotationUpdate:(NSNotification *)notification {
-	UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-	self.dockView.barmoji.alpha = UIDeviceOrientationIsLandscape(orientation) ? 0 : 1;
-}
-
-%end
-
 %hook UIKeyboardPredictionView
 %property (retain, nonatomic) BarmojiCollectionView *barmoji;
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -60,7 +34,7 @@ int barmojiFeedbackType = 7;
 
 			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:predictionView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0]];
 			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:predictionView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0]];
-			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:40]];
+			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:30]];
 			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:predictionView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0]];
 		}
 
