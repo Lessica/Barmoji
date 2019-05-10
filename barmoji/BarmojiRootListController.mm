@@ -97,6 +97,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
     [mutableSpecifiers addObject:specifier];
 
     specifier = groupSpecifier(@"Layout");
+    setFooterForSpec(@"Scroll direction only applies to the Predictive Bar location.");
     [mutableSpecifiers addObject:specifier];
 
     specifier = [PSSpecifier preferenceSpecifierNamed:@"Scroll Direction" target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
