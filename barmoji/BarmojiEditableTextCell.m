@@ -3,12 +3,12 @@
 
 @implementation BarmojiEditableTextCell
 - (id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3 {
-	BarmojiEditableTextCell *editTextCell = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
-	((UITextField *)[editTextCell textField]).returnKeyType = UIReturnKeyDone;
-	return editTextCell;
+	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
+	((UITextField *)[self textField]).returnKeyType = UIReturnKeyDone;
+	return self;
 }
 
-- (BOOL)textFieldShouldReturn:(id)arg1 {
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
 	return YES;
 }
 
