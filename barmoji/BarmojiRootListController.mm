@@ -181,9 +181,9 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
   [composeViewController setToRecipients:[NSArray arrayWithObjects:@"CP Digital Darkroom <tweaks@cpdigitaldarkroom.support>", nil]];
 
   NSString *product = nil, *version = nil, *build = nil;
-  product = (NSString *)MGCopyAnswer(kMGProductType);
-  version = (NSString *)MGCopyAnswer(kMGProductVersion);
-  build = (NSString *)MGCopyAnswer(kMGBuildVersion);
+  product = (__bridge_transfer NSString *)MGCopyAnswer(kMGProductType);
+  version = (__bridge_transfer NSString *)MGCopyAnswer(kMGProductVersion);
+  build = (__bridge_transfer NSString *)MGCopyAnswer(kMGBuildVersion);
 
   [composeViewController setMessageBody:[NSString stringWithFormat:@"\n\nCurrent Device: %@, iOS %@ (%@)", product, version, build] isHTML:NO];
 
@@ -196,13 +196,11 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
   [task launch];
 
   NSData *data = [[[task standardOutput] fileHandleForReading] readDataToEndOfFile];
-  [task release];
 
   [composeViewController addAttachmentData:data mimeType:@"text/plain" fileName:@"dpkgl.txt"];
 
   [self.navigationController presentViewController:composeViewController animated:YES completion:nil];
   composeViewController.mailComposeDelegate = self;
-  [composeViewController release];
 
 }
 
