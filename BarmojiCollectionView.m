@@ -48,9 +48,9 @@
     }
 
 	UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    flowLayout.scrollDirection = self.direction;
+    flowLayout.scrollDirection = self.replacesPredictiveBar ? self.direction : UICollectionViewScrollDirectionHorizontal;
     flowLayout.minimumInteritemSpacing = 0;
-    flowLayout.minimumLineSpacing = 0;
+    flowLayout.minimumLineSpacing = self.replacesPredictiveBar ? 0 : 20;
 
     if(self = [super initWithFrame:CGRectZero collectionViewLayout:flowLayout]) {
 
