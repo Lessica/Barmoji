@@ -13,7 +13,7 @@
 @interface BarmojiCollectionView () <UICollectionViewDataSource, UICollectionViewDelegate>
 
 @property (assign, nonatomic) UICollectionViewScrollDirection direction;
-@property (assign, nonatomic) BOOL replacesPredictiveBar;
+@property (assign, nonatomic) BOOL replacingPredictiveBar;
 @property (assign, nonatomic) BOOL useCustomEmojis;
 @property (strong, nonatomic) NSArray *customEmojis;
 @property (assign, nonatomic) int emojiPerRow;
@@ -23,12 +23,12 @@
 
 @implementation BarmojiCollectionView
 
-- (instancetype)init {
+- (instancetype)initForPredictiveBar:(BOOL)forPredictive; {
     
     NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/private/var/mobile/Library/Preferences/com.cpdigitaldarkroom.barmoji.plist"];
     int emojiSource = ([prefs objectForKey:@"EmojiSource"] ? [[prefs objectForKey:@"EmojiSource"] intValue] : 1);
     _direction = ([[prefs objectForKey:@"BarmojiScrollDirection"] ?: @(UICollectionViewScrollDirectionHorizontal) integerValue]);
-    _replacesPredictiveBar = ([prefs objectForKey:@"BarmojiPredictiveEnabled"] ? [[prefs objectForKey:@"BarmojiPredictiveEnabled"] boolValue] : NO);
+    _replacingPredictiveBar = forPredictive;
     _useCustomEmojis = (emojiSource == 2);
 
     if(_useCustomEmojis) {
@@ -46,11 +46,11 @@
     } else {
         self.emojiManager = [[NSClassFromString(@"UIKeyboardEmojiKeyDisplayController") alloc] init];
     }
-
-	UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    flowLayout.scrollDirection = self.replacesPredictiveBar ? self.direction : UICollectionViewScrollDirectionHorizontal;
+    
+    UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
+    flowLayout.scrollDirection = self.replacingPredictiveBar ? self.direction : UICollectionViewScrollDirectionHorizontal;
     flowLayout.minimumInteritemSpacing = 0;
-    flowLayout.minimumLineSpacing = self.replacesPredictiveBar ? 0 : 20;
+    flowLayout.minimumLineSpacing = 0;
 
     if(self = [super initWithFrame:CGRectZero collectionViewLayout:flowLayout]) {
 
@@ -64,6 +64,11 @@
         
         [self rotationUpdate:nil];
 
+        // I don't like this at all // there's likely some memory fuckery going on with Barmoji
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [self rotationUpdate:nil];
+        });
+
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rotationUpdate:) name:UIDeviceOrientationDidChangeNotification object:nil];
 
     }
@@ -75,15 +80,19 @@
 }
 
 - (void)rotationUpdate:(NSNotification *)notification {
-	UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-	BOOL landscape = UIInterfaceOrientationIsLandscape(orientation);
 
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    BOOL landscape = UIInterfaceOrientationIsLandscape(orientation);
+    
     // We don't want it to disappear in landscape if we're replacing the predictive bar
-    self.alpha = landscape && !self.replacesPredictiveBar ? 0 : 1;
+    self.alpha = landscape && !self.replacingPredictiveBar ? 0 : 1;
+    NSLog(@"USING ALPHA: %f", self.alpha);
+    NSLog(@"Emojis %ld", [self numberOfItemsInSection:0]);
     // Landscape gets 12 emojis in the predictive bar,
     // Portrait gets 8 in the predictive bar or 6 on the bottom
-    self.emojiPerRow = landscape ? 12 : (self.replacesPredictiveBar ? 8 : 6);
+    self.emojiPerRow = landscape ? 12 : (self.replacingPredictiveBar ? 8 : 6);
     [self reloadData];
+    
 }
 
 #pragma mark - UICollectionViewDelegate
@@ -97,7 +106,7 @@
     } else {
         cell.emoji = [self.emojiManager recents][indexPath.row];
     }
-    
+
     cell.emojiFontSize = 26;
     return cell;
 }
@@ -112,7 +121,7 @@
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return self.replacesPredictiveBar ? UIEdgeInsetsZero : UIEdgeInsetsMake(22, 0, 0, 0);
+    return self.replacingPredictiveBar ? UIEdgeInsetsZero : UIEdgeInsetsMake(22, 0, 0, 0);
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {

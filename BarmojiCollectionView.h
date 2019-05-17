@@ -12,4 +12,6 @@
 
 @property (assign, nonatomic) int feedbackType;
 
+- (instancetype)initForPredictiveBar:(BOOL)forPredictive;
+
 @end

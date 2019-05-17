@@ -27,7 +27,7 @@ int barmojiFeedbackType = 7;
 	if(predictionView) {
 
 		if(barmojiEnabled && barmojiPredictiveEnabled) {
-			self.barmoji = [[BarmojiCollectionView alloc] init];
+			self.barmoji = [[BarmojiCollectionView alloc] initForPredictiveBar:YES];
 			self.barmoji.feedbackType = barmojiFeedbackType;
 			self.barmoji.translatesAutoresizingMaskIntoConstraints = NO;
 			[predictionView addSubview:self.barmoji];
@@ -69,7 +69,7 @@ int barmojiFeedbackType = 7;
 	if(dockView) {
 
 		if(barmojiEnabled && barmojiBottomEnabled) {
-			self.barmoji = [[BarmojiCollectionView alloc] init];
+			self.barmoji = [[BarmojiCollectionView alloc] initForPredictiveBar:NO];
 			self.barmoji.feedbackType = barmojiFeedbackType;
 			self.barmoji.translatesAutoresizingMaskIntoConstraints = NO;
 			[dockView addSubview:self.barmoji];
