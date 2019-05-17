@@ -86,8 +86,6 @@
     
     // We don't want it to disappear in landscape if we're replacing the predictive bar
     self.alpha = landscape && !self.replacingPredictiveBar ? 0 : 1;
-    NSLog(@"USING ALPHA: %f", self.alpha);
-    NSLog(@"Emojis %ld", [self numberOfItemsInSection:0]);
     // Landscape gets 12 emojis in the predictive bar,
     // Portrait gets 8 in the predictive bar or 6 on the bottom
     self.emojiPerRow = landscape ? 12 : (self.replacingPredictiveBar ? 8 : 6);
