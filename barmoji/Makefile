@@ -9,6 +9,7 @@ Barmoji_INSTALL_PATH = /Library/PreferenceBundles
 Barmoji_FRAMEWORKS = UIKit MessageUI Social CoreGraphics
 Barmoji_PRIVATE_FRAMEWORKS = Preferences
 Barmoji_LDFLAGS = -lMobileGestalt
+Barmoji_CFLAGS += -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

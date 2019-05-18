@@ -181,9 +181,9 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
   [composeViewController setToRecipients:[NSArray arrayWithObjects:@"CP Digital Darkroom <tweaks@cpdigitaldarkroom.support>", nil]];
 
   NSString *product = nil, *version = nil, *build = nil;
-  product = (NSString *)MGCopyAnswer(kMGProductType);
-  version = (NSString *)MGCopyAnswer(kMGProductVersion);
-  build = (NSString *)MGCopyAnswer(kMGBuildVersion);
+  product = (__bridge_transfer NSString *)MGCopyAnswer(kMGProductType);
+  version = (__bridge_transfer NSString *)MGCopyAnswer(kMGProductVersion);
+  build = (__bridge_transfer NSString *)MGCopyAnswer(kMGBuildVersion);
 
   [composeViewController setMessageBody:[NSString stringWithFormat:@"\n\nCurrent Device: %@, iOS %@ (%@)", product, version, build] isHTML:NO];
 
@@ -196,13 +196,11 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
   [task launch];
 
   NSData *data = [[[task standardOutput] fileHandleForReading] readDataToEndOfFile];
-  [task release];
 
   [composeViewController addAttachmentData:data mimeType:@"text/plain" fileName:@"dpkgl.txt"];
 
   [self.navigationController presentViewController:composeViewController animated:YES completion:nil];
   composeViewController.mailComposeDelegate = self;
-  [composeViewController release];
 
 }
 
@@ -227,13 +225,16 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
   BOOL enabled = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
   BOOL predictive = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiPredictiveEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
 
-  CFMutableDictionaryRef dictionary = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-  CFDictionaryAddValue(dictionary, @"feedbackType", CFBridgingRetain([NSNumber numberWithInt:feedbackType]));
-  CFDictionaryAddValue(dictionary, @"bottom", CFBridgingRetain([NSNumber numberWithBool:bottom]));
-  CFDictionaryAddValue(dictionary, @"enabled", CFBridgingRetain([NSNumber numberWithBool:enabled]));
-  CFDictionaryAddValue(dictionary, @"predictive", CFBridgingRetain([NSNumber numberWithBool:predictive]));
-  CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(), CFSTR("com.cpdigitaldarkroom.barmoji.settings"), nil, dictionary, true);
-  CFRelease(dictionary);
+  NSDictionary *dictionary = @{
+    @"feedbackType": @(feedbackType),
+    @"bottom": @(bottom),
+    @"enabled": @(enabled),
+    @"predictive": @(predictive)
+  };
+  CFNotificationCenterPostNotification(
+    CFNotificationCenterGetDistributedCenter(),
+    CFSTR("com.cpdigitaldarkroom.barmoji.settings"),
+    nil, (__bridge CFDictionaryRef)dictionary, true);
 }
 
 - (void)shouldShowCustomEmojiSpecifiers:(BOOL)show {
