@@ -1,5 +1,9 @@
-TARGET = :clang:11.2:7.0
-ARCHS = arm64 arm64e
+ifeq ($(SIMJECT),1)
+TARGET = simulator:clang:latest:8.0
+export ARCHS = x86_64
+else
+endif
+
 FINALPACKAGE = 1
 
 include $(THEOS)/makefiles/common.mk
@@ -10,10 +14,9 @@ Barmoji_CFLAGS += -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
-before-stage::
-	find . -name ".DS_Store" -delete
-
 after-install::
 	install.exec "killall -9 SpringBoard"
+
 SUBPROJECTS += barmoji
+
 include $(THEOS_MAKE_PATH)/aggregate.mk

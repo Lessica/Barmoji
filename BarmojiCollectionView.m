@@ -9,13 +9,16 @@
 #import "Barmoji.h"
 #import "BarmojiCollectionView.h"
 #import "BarmojiHapticsManager.h"
+#import "BarmojiEmojiCell.h"
 
 @interface BarmojiCollectionView () <UICollectionViewDataSource, UICollectionViewDelegate>
 
 @property (assign, nonatomic) UICollectionViewScrollDirection direction;
+@property (assign, nonatomic) BOOL fullWidth;
 @property (assign, nonatomic) BOOL replacingPredictiveBar;
 @property (assign, nonatomic) BOOL useCustomEmojis;
 @property (strong, nonatomic) NSArray *customEmojis;
+@property (strong, nonatomic) NSArray *recentEmojis;
 @property (assign, nonatomic) int emojiPerRow;
 @property (strong, nonatomic) UIKeyboardEmojiKeyDisplayController *emojiManager;
 
@@ -26,8 +29,12 @@
 - (instancetype)initForPredictiveBar:(BOOL)forPredictive; {
     
     NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/private/var/mobile/Library/Preferences/com.cpdigitaldarkroom.barmoji.plist"];
+
     int emojiSource = ([prefs objectForKey:@"EmojiSource"] ? [[prefs objectForKey:@"EmojiSource"] intValue] : 1);
+
     _direction = ([[prefs objectForKey:@"BarmojiScrollDirection"] ?: @(UICollectionViewScrollDirectionHorizontal) integerValue]);
+    _emojiPerRow = 6;
+    _fullWidth = ([prefs objectForKey:@"BarmojiFullWidthBottom"] ? [[prefs objectForKey:@"BarmojiFullWidthBottom"] boolValue] : NO);
     _replacingPredictiveBar = forPredictive;
     _useCustomEmojis = (emojiSource == 2);
 
@@ -45,6 +52,7 @@
 
     } else {
         self.emojiManager = [[NSClassFromString(@"UIKeyboardEmojiKeyDisplayController") alloc] init];
+        self.recentEmojis = [self.emojiManager recents];
     }
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
@@ -53,23 +61,19 @@
     flowLayout.minimumLineSpacing = 0;
 
     if(self = [super initWithFrame:CGRectZero collectionViewLayout:flowLayout]) {
-
+        self.backgroundColor = [UIColor clearColor];
         self.delegate = self;
         self.dataSource = self;
         self.showsVerticalScrollIndicator = NO;
         self.showsHorizontalScrollIndicator = NO;
         self.pagingEnabled = YES;
-        [self registerClass:NSClassFromString(@"UIKeyboardEmojiCollectionViewCell") forCellWithReuseIdentifier:@"EmojiKey"];
-        self.backgroundColor = [UIColor clearColor];
+        [self registerClass:NSClassFromString(@"BarmojiEmojiCell") forCellWithReuseIdentifier:@"kEmojiCellIdentifier"];
         
         [self rotationUpdate:nil];
 
-        // I don't like this at all // there's likely some memory fuckery going on with Barmoji
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [self rotationUpdate:nil];
-        });
-
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rotationUpdate:) name:UIDeviceOrientationDidChangeNotification object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadLayout:) name:@"barmoji_reloadLayout" object:nil];
 
     }
     return self;
@@ -77,6 +81,10 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
+}
+
+- (void)reloadLayout:(NSNotification *)note {
+    [self reloadData];
 }
 
 - (void)rotationUpdate:(NSNotification *)notification {
@@ -88,7 +96,7 @@
     self.alpha = landscape && !self.replacingPredictiveBar ? 0 : 1;
     // Landscape gets 12 emojis in the predictive bar,
     // Portrait gets 8 in the predictive bar or 6 on the bottom
-    self.emojiPerRow = landscape ? 12 : (self.replacingPredictiveBar ? 8 : 6);
+    self.emojiPerRow = (landscape) ? 12 : ((self.replacingPredictiveBar || self.fullWidth ) ? 8 : 6);
     [self reloadData];
     
 }
@@ -96,30 +104,32 @@
 #pragma mark - UICollectionViewDelegate
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    UIKeyboardEmojiCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"EmojiKey" forIndexPath:indexPath];
-
+    BarmojiEmojiCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"kEmojiCellIdentifier" forIndexPath:indexPath];
     if(_useCustomEmojis) {
         NSString *emojiString = self.customEmojis[indexPath.row];
         cell.emoji = [UIKeyboardEmoji emojiWithString:emojiString withVariantMask:0];
     } else {
-        cell.emoji = [self.emojiManager recents][indexPath.row];
+        cell.emoji = _recentEmojis[indexPath.row];
     }
-
-    cell.emojiFontSize = 26;
     return cell;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    int count =  _useCustomEmojis ? self.customEmojis.count : [self.emojiManager recents].count;
+    int count =  _useCustomEmojis ? self.customEmojis.count : _recentEmojis.count;
     return count;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(self.bounds.size.width / self.emojiPerRow, 30);
+    CGFloat useableWidth = collectionView.frame.size.width / self.emojiPerRow;
+    return CGSizeMake(useableWidth, 34);
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return self.replacingPredictiveBar ? UIEdgeInsetsZero : UIEdgeInsetsMake(22, 0, 0, 0);
+    if (self.replacingPredictiveBar || self.fullWidth) {
+        return UIEdgeInsetsZero;
+    }
+
+    return UIEdgeInsetsMake(22, 0, 0, 0);
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
