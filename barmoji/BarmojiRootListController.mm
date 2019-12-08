@@ -73,16 +73,25 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
       }
     }
 
-    specifier = groupSpecifier(@"Locations");
-    setFooterForSpec(@"Bottom Bar: The default Barmoji implementation for iPhone X or devices who have enabled the iPhone X layout. \n\nReplace Predictive Bar: Replaces the text prediction bar with Barmoji, useful for non-iPhone X devices");
+    specifier = groupSpecifier(@"Bottom Bar");
+    setFooterForSpec(@"The default Barmoji implementation for iPhone X or devices who have enabled the iPhone X layout.");
     [mutableSpecifiers addObject:specifier];
 
-    specifier = subtitleSwitchCellWithName(@"Bottom Bar");
+    specifier = subtitleSwitchCellWithName(@"Enabled");
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
     setKeyForSpec(@"BarmojiBottomEnabled");
     [mutableSpecifiers addObject:specifier];
 
-    specifier = subtitleSwitchCellWithName(@"Replace Predictive Bar");
+    specifier = subtitleSwitchCellWithName(@"Full Width");
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setKeyForSpec(@"BarmojiFullWidthBottom");
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = groupSpecifier(@"Predictive Bar");
+    setFooterForSpec(@"Replaces the text prediction bar with Barmoji, useful for non-iPhone X devices");
+    [mutableSpecifiers addObject:specifier];
+
+    specifier = subtitleSwitchCellWithName(@"Enabled");
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
     setKeyForSpec(@"BarmojiPredictiveEnabled");
     [mutableSpecifiers addObject:specifier];
@@ -181,9 +190,9 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
   [composeViewController setToRecipients:[NSArray arrayWithObjects:@"CP Digital Darkroom <tweaks@cpdigitaldarkroom.support>", nil]];
 
   NSString *product = nil, *version = nil, *build = nil;
-  product = (NSString *)MGCopyAnswer(kMGProductType);
-  version = (NSString *)MGCopyAnswer(kMGProductVersion);
-  build = (NSString *)MGCopyAnswer(kMGBuildVersion);
+  product = (NSString *)MGCopyAnswer(kMGProductType, nil);
+  version = (NSString *)MGCopyAnswer(kMGProductVersion, nil);
+  build = (NSString *)MGCopyAnswer(kMGBuildVersion, nil);
 
   [composeViewController setMessageBody:[NSString stringWithFormat:@"\n\nCurrent Device: %@, iOS %@ (%@)", product, version, build] isHTML:NO];
 
@@ -225,12 +234,14 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
   int feedbackType = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiFeedbackType"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
   BOOL bottom = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiBottomEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
   BOOL enabled = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
+  BOOL fullWidth = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiFullWidthBottom"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
   BOOL predictive = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiPredictiveEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
 
   CFMutableDictionaryRef dictionary = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
   CFDictionaryAddValue(dictionary, @"feedbackType", CFBridgingRetain([NSNumber numberWithInt:feedbackType]));
   CFDictionaryAddValue(dictionary, @"bottom", CFBridgingRetain([NSNumber numberWithBool:bottom]));
   CFDictionaryAddValue(dictionary, @"enabled", CFBridgingRetain([NSNumber numberWithBool:enabled]));
+  CFDictionaryAddValue(dictionary, @"fullWidth", CFBridgingRetain([NSNumber numberWithBool:fullWidth]));
   CFDictionaryAddValue(dictionary, @"predictive", CFBridgingRetain([NSNumber numberWithBool:predictive]));
   CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(), CFSTR("com.cpdigitaldarkroom.barmoji.settings"), nil, dictionary, true);
   CFRelease(dictionary);

@@ -1,10 +1,10 @@
 Package: com.cpdigitaldarkroom.barmoji
 Name: Barmoji
 Depends: mobilesubstrate, preferenceloader
-Version: 1.9
+Version: 2019.1~beta6
 Architecture: iphoneos-arm
 Description: Quick Emoji Access Bar
 Maintainer: CP Digital Darkroom <admin@cpdigitaldarkroom.com>
 Author: CP Digital Darkroom <admin@cpdigitaldarkroom.com>
 Section: Tweaks
-Tag: purpose::extension, compatible_min::ios10, compatible_max::ios12.1.12
+Tag: purpose::extension, compatible_min::ios10, compatible_max::ios13.3

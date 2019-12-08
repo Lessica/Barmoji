@@ -17,6 +17,12 @@
 -(NSArray *)recentEmojis;
 @end
 
+@class BarmojiCollectionView;
+
+@interface TUIPredictionView : UIView // iOS 13 +
+@property (nonatomic,retain) BarmojiCollectionView* barmoji;
+@end
+
 @interface UIKeyboardImpl : UIView
 
 +(id)activeInstance;
@@ -37,13 +43,20 @@
 - (NSArray *)recents;
 @end
 
-@class BarmojiCollectionView;
 @interface UIKeyboardPredictionView : UIView
 @property (nonatomic,retain) BarmojiCollectionView* barmoji;
 @end
 
+@interface UIKeyboardDockItemButton: UIButton
+@end
+
+@interface UIKeyboardDockItem : NSObject
+@property (nonatomic,retain) UIKeyboardDockItemButton * button; 
+@end
+
 @interface UIKeyboardDockView : UIView
 @property (nonatomic,retain) BarmojiCollectionView* barmoji;
+-(id)_keyboardLayoutView;
 @end
 
 @interface UISystemKeyboardDockController : UIViewController

@@ -10,7 +10,8 @@
 
 #import <MessageUI/MessageUI.h>
 #import <MobileGestalt/MobileGestalt.h>
-#import <Preferences/Preferences.h>
+#import <Preferences/PSSpecifier.h>
+#import <Preferences/PSListController.h>
 #import <Social/Social.h>
 #import <Twitter/TWTweetComposeViewController.h>
 #import <UIKit/UIImage+Private.h>
