@@ -190,9 +190,9 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
   [composeViewController setToRecipients:[NSArray arrayWithObjects:@"CP Digital Darkroom <tweaks@cpdigitaldarkroom.support>", nil]];
 
   NSString *product = nil, *version = nil, *build = nil;
-  product = (NSString *)MGCopyAnswer(kMGProductType, nil);
-  version = (NSString *)MGCopyAnswer(kMGProductVersion, nil);
-  build = (NSString *)MGCopyAnswer(kMGBuildVersion, nil);
+  product = (__bridge NSString *)MGCopyAnswer(kMGProductType, nil);
+  version = (__bridge NSString *)MGCopyAnswer(kMGProductVersion, nil);
+  build = (__bridge NSString *)MGCopyAnswer(kMGBuildVersion, nil);
 
   [composeViewController setMessageBody:[NSString stringWithFormat:@"\n\nCurrent Device: %@, iOS %@ (%@)", product, version, build] isHTML:NO];
 
@@ -237,6 +237,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 
   NSDictionary *dictionary = @{
     @"feedbackType": @(feedbackType),
+    @"fullwidth": @(fullWidth),
     @"bottom": @(bottom),
     @"enabled": @(enabled),
     @"predictive": @(predictive)
