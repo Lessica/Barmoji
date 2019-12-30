@@ -212,6 +212,7 @@ static void updateSettings(CFNotificationCenterRef center, void *observer, CFStr
 	NSDictionary *info = (__bridge NSDictionary*)userInfo;
 
 	barmojiBottomEnabled = [info[@"bottom"] boolValue];
+	barmojiBottomFullWidth = [info[@"fullwidth"] boolValue];
 	barmojiEnabled = [info[@"enabled"] boolValue];
 	barmojiFeedbackType = [info[@"feedbackType"] intValue];
 	barmojiPredictiveEnabled = [info[@"predictive"] boolValue];
