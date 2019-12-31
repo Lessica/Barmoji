@@ -203,7 +203,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
     [task setStandardOutput:pipe];
     [task launch];
 
-    NSData *data = [[[task standardOutput] fileHandleForReading] readDataToEndOfFile];
+    NSData *data = [task.standardOutput fileHandleForReading].readDataToEndOfFile;
 
     [composeViewController addAttachmentData:data mimeType:@"text/plain" fileName:@"dpkgl.txt"];
 
