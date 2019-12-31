@@ -1,3 +1,11 @@
+//
+//  BarmojiEditableTextCell.m
+//  barmoji
+//  
+//  Created by Juan Carlos Perez <carlos@jcarlosperez.me> 05/07/2019
+//  © CP Digital Darkroom <admin@cpdigitaldarkroom.com> All rights reserved.
+//
+
 #import "BarmojiEditableTextCell.h"
 #import "BarmojiPreferences.h"
 
@@ -81,7 +89,6 @@
     }
 
     return colorPixelFound;
-
 }
 
 @end
