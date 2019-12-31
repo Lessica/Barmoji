@@ -38,7 +38,7 @@
     _replacingPredictiveBar = forPredictive;
     _useCustomEmojis = (emojiSource == 2);
 
-    if(_useCustomEmojis) {
+    if (_useCustomEmojis) {
         NSString *emojiString = ([prefs objectForKey:@"CustomEmojis"] ? [prefs objectForKey:@"CustomEmojis"] : @"");
 
         NSMutableArray *emojis = [NSMutableArray new]; 
@@ -60,7 +60,8 @@
     flowLayout.minimumInteritemSpacing = 0;
     flowLayout.minimumLineSpacing = 0;
 
-    if(self = [super initWithFrame:CGRectZero collectionViewLayout:flowLayout]) {
+    self = [super initWithFrame:CGRectZero collectionViewLayout:flowLayout];
+    if (self) {
         self.backgroundColor = [UIColor clearColor];
         self.delegate = self;
         self.dataSource = self;
@@ -105,7 +106,7 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     BarmojiEmojiCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"kEmojiCellIdentifier" forIndexPath:indexPath];
-    if(_useCustomEmojis) {
+    if (_useCustomEmojis) {
         NSString *emojiString = self.customEmojis[indexPath.row];
         cell.emoji = [UIKeyboardEmoji emojiWithString:emojiString withVariantMask:0];
     } else {
@@ -115,8 +116,7 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    int count =  _useCustomEmojis ? self.customEmojis.count : _recentEmojis.count;
-    return count;
+    return _useCustomEmojis ? self.customEmojis.count : _recentEmojis.count;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -124,7 +124,7 @@
     return CGSizeMake(useableWidth, 34);
 }
 
-- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     if (self.replacingPredictiveBar || self.fullWidth) {
         return UIEdgeInsetsZero;
     }
@@ -134,12 +134,12 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 
-    if(self.feedbackType != 7) {
+    if (self.feedbackType != 7) {
         [[BarmojiHapticsManager sharedManager] actuateHapticsForType:self.feedbackType];
     }
     
     UIKeyboardEmoji *pressedEmoji;
-    if(_useCustomEmojis) {
+    if (_useCustomEmojis) {
         NSString *emojiString = self.customEmojis[indexPath.row];
         pressedEmoji = [UIKeyboardEmoji emojiWithString:emojiString withVariantMask:0];
     } else {
@@ -150,5 +150,3 @@
 }
 
 @end
-
-

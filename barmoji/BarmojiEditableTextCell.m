@@ -1,10 +1,20 @@
+//
+//  BarmojiEditableTextCell.m
+//  barmoji
+//  
+//  Created by Juan Carlos Perez <carlos@jcarlosperez.me> 05/07/2019
+//  © CP Digital Darkroom <admin@cpdigitaldarkroom.com> All rights reserved.
+//
+
 #import "BarmojiEditableTextCell.h"
 #import "BarmojiPreferences.h"
 
 @implementation BarmojiEditableTextCell
 - (id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3 {
 	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
-	[self textField].returnKeyType = UIReturnKeyDone;
+	if (self) {
+        [self textField].returnKeyType = UIReturnKeyDone;
+    }
 	return self;
 }
 
@@ -13,26 +23,21 @@
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-
-	if([string length] > 0) {
-		if ([self isEmoji:string]) {
-			return YES;
-		} else {
-			return NO;
-		}
+	if (string.length > 0) {
+		return [self isEmoji:string];
 	}
+
 	return YES;
 }
 
 - (BOOL)isEmoji:(NSString *)character {
-
-    UILabel *characterRender = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 1, 1)];
+    UILabel *characterRender = [[UILabel alloc] initWithFrame:CGRectZero];
     characterRender.text = character;
     characterRender.backgroundColor = [UIColor blackColor];//needed to remove subpixel rendering colors
     [characterRender sizeToFit];
 
     CGRect rect = [characterRender bounds];
-    UIGraphicsBeginImageContextWithOptions(rect.size,YES,0.0f);
+    UIGraphicsBeginImageContextWithOptions(rect.size, YES, 0.0f);
     CGContextRef contextSnap = UIGraphicsGetCurrentContext();
     [characterRender.layer renderInContext:contextSnap];
     UIImage *capturedImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -42,9 +47,9 @@
     NSUInteger width = CGImageGetWidth(imageRef);
     NSUInteger height = CGImageGetHeight(imageRef);
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    unsigned char *rawData = (unsigned char*) calloc(height * width * 4, sizeof(unsigned char));
+    unsigned char *rawData = (unsigned char *) calloc(height * width * 4, sizeof(unsigned char));
     NSUInteger bytesPerPixel = 4;
-    NSUInteger bytesPerRow = bytesPerPixel * width;
+    NSUInteger bytesPerRow = bytesPerPixel *width;
     NSUInteger bitsPerComponent = 8;
     CGContextRef context = CGBitmapContextCreate(rawData, width, height,
                                                  bitsPerComponent, bytesPerRow, colorSpace,
@@ -84,7 +89,6 @@
     }
 
     return colorPixelFound;
-
 }
 
 @end
