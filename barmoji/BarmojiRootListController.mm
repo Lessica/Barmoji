@@ -12,15 +12,14 @@
 extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void);
 
 @interface BarmojiRootListController : PSListController <MFMailComposeViewControllerDelegate>
-
 @property (strong, nonatomic) NSMutableArray *dynamicSpecs;
-
 @end
 
 @implementation BarmojiRootListController
 
 - (instancetype)init {
-  if(self = [super init]) {
+  self = [super init];
+    if (self) {
     [self createDynamicSpecs];
   }
   return self;
@@ -42,8 +41,8 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
   [_dynamicSpecs addObject:specifier];
 }
 
--(id)specifiers {
-  if(_specifiers == nil) {
+- (id)specifiers {
+  if (_specifiers == nil) {
 
     NSMutableArray *mutableSpecifiers = [NSMutableArray new];
     PSSpecifier *specifier;
@@ -67,7 +66,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 		[mutableSpecifiers addObject:specifier];
 
     int sourceType = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("EmojiSource"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
-    if(sourceType == 2) {
+    if (sourceType == 2) {
       for(PSSpecifier *sp in _dynamicSpecs) {
         [mutableSpecifiers addObject:sp];
       }
@@ -213,18 +212,18 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 
 }
 
-- (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
   [self dismissViewControllerAnimated: YES completion: nil];
 }
 
--(void)setPreferenceValue:(id)value specifier:(PSSpecifier*)specifier {
+- (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier {
   
   [super setPreferenceValue:value specifier:specifier];
 
   NSDictionary *properties = specifier.properties;
   NSString *key = properties[@"key"];
 
-  if([key isEqualToString:@"EmojiSource"]) {
+  if ([key isEqualToString:@"EmojiSource"]) {
     BOOL shouldShow = [value intValue] == 2;
     [self shouldShowCustomEmojiSpecifiers:shouldShow];
   }
@@ -249,7 +248,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 }
 
 - (void)shouldShowCustomEmojiSpecifiers:(BOOL)show {
-  if(show) {
+  if (show) {
     [self insertContiguousSpecifiers:_dynamicSpecs afterSpecifierID:@"EmojiSource" animated:YES];
   } else {
     [self removeContiguousSpecifiers:_dynamicSpecs animated:YES];
@@ -259,8 +258,8 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 - (void)respring {
   pid_t pid;
   int status;
-  const char* args[] = {"killall", "-9", "backboardd", NULL};
-  posix_spawn(&pid, "/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
+  const char *args[] = {"killall", "-9", "backboardd", NULL};
+  posix_spawn(&pid, "/usr/bin/killall", NULL, NULL, (char * const *)args, NULL);
   waitpid(pid, &status, WEXITED);
 }
 

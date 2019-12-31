@@ -30,8 +30,8 @@ int barmojiFeedbackType = 7;
 - (instancetype)initWithFrame:(CGRect)frame {
 	TUIPredictionView *predictionView = %orig;
 
-	if(predictionView) {
-		if(barmojiEnabled && barmojiPredictiveEnabled) {
+	if (predictionView) {
+		if (barmojiEnabled && barmojiPredictiveEnabled) {
 
 			self.barmoji = [[BarmojiCollectionView alloc] initForPredictiveBar:YES];
 			self.barmoji.feedbackType = barmojiFeedbackType;
@@ -52,8 +52,8 @@ int barmojiFeedbackType = 7;
 }
 
 - (void)addSubview:(UIView *)subview {
-	if(barmojiEnabled && barmojiPredictiveEnabled) {
-		if(![subview isKindOfClass:[BarmojiCollectionView class]]) {
+	if (barmojiEnabled && barmojiPredictiveEnabled) {
+		if (![subview isKindOfClass:[BarmojiCollectionView class]]) {
 			subview.hidden = YES;
 		}
 	}
@@ -66,9 +66,9 @@ int barmojiFeedbackType = 7;
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"TryReloadTest" object:nil];
 }
 
--(void)_didRecognizeTapGesture:(id)arg1 {
-	if(barmojiEnabled) {
-		if(barmojiPredictiveEnabled && showingBarmoji) {
+- (void)_didRecognizeTapGesture:(id)arg1 {
+	if (barmojiEnabled) {
+		if (barmojiPredictiveEnabled && showingBarmoji) {
 			return;
 		}
 	}
@@ -119,8 +119,8 @@ int barmojiFeedbackType = 7;
 - (instancetype)initWithFrame:(CGRect)frame {
 	UIKeyboardPredictionView *predictionView = %orig;
 
-	if(predictionView) {
-		if(barmojiEnabled && barmojiPredictiveEnabled) {
+	if (predictionView) {
+		if (barmojiEnabled && barmojiPredictiveEnabled) {
 
 			self.barmoji = [[BarmojiCollectionView alloc] initForPredictiveBar:YES];
 			self.barmoji.feedbackType = barmojiFeedbackType;
@@ -141,17 +141,17 @@ int barmojiFeedbackType = 7;
 }
 
 - (void)addSubview:(UIView *)subview {
-	if(barmojiEnabled && barmojiPredictiveEnabled) {
-		if(![subview isKindOfClass:[BarmojiCollectionView class]]) {
+	if (barmojiEnabled && barmojiPredictiveEnabled) {
+		if (![subview isKindOfClass:[BarmojiCollectionView class]]) {
 			subview.hidden = YES;
 		}
 	}
 	%orig;
 }
 
--(void)activateCandidateAtPoint:(CGPoint)arg1  {
-	if(barmojiEnabled) {
-		if(barmojiPredictiveEnabled && showingBarmoji) {
+- (void)activateCandidateAtPoint:(CGPoint)arg1  {
+	if (barmojiEnabled) {
+		if (barmojiPredictiveEnabled && showingBarmoji) {
 			return;
 		}
 	}
@@ -183,9 +183,9 @@ int barmojiFeedbackType = 7;
 
 - (instancetype)initWithFrame:(CGRect)frame {
 	UIKeyboardDockView *dockView = %orig;
-	if(dockView) {
+	if (dockView) {
 
-		if(barmojiEnabled && barmojiBottomEnabled) {
+		if (barmojiEnabled && barmojiBottomEnabled) {
 			self.barmoji = [[BarmojiCollectionView alloc] initForPredictiveBar:NO];
 			self.barmoji.feedbackType = barmojiFeedbackType;
 			self.barmoji.translatesAutoresizingMaskIntoConstraints = NO;
@@ -200,12 +200,12 @@ int barmojiFeedbackType = 7;
 	return dockView;
 }
 
--(void)setLeftDockItem:(UIKeyboardDockItem *)arg1 {
-	if(barmojiBottomFullWidth) { return ;}
+- (void)setLeftDockItem:(UIKeyboardDockItem *)arg1 {
+	if (barmojiBottomFullWidth) { return;}
 	%orig;
 }
--(void)setRightDockItem:(UIKeyboardDockItem *)arg1 {
-	if(barmojiBottomFullWidth) { return ;}
+- (void)setRightDockItem:(UIKeyboardDockItem *)arg1 {
+	if (barmojiBottomFullWidth) { return;}
 	%orig;
 }
 
@@ -229,7 +229,7 @@ static void loadPrefs() {
 
 static void updateSettings(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
 
-	NSDictionary *info = (__bridge NSDictionary*)userInfo;
+	NSDictionary *info = (__bridge NSDictionary *)userInfo;
 
 	barmojiBottomEnabled = [info[@"bottom"] boolValue];
 	barmojiBottomFullWidth = [info[@"fullwidth"] boolValue];
@@ -259,12 +259,10 @@ static void updateSettings(CFNotificationCenterRef center, void *observer, CFStr
 				BOOL isApplication = [executablePath rangeOfString:@"/Application"].location != NSNotFound;
 				
 				if (isSpringBoard || isApplication) {
-
 					loadPrefs();
 
 					if (@available(iOS 13, *)) {
-						
-						NSBundle* bundle = [NSBundle bundleWithPath:@"/System/Library/PrivateFrameworks/TextInputUI.framework"];
+						NSBundle *bundle = [NSBundle bundleWithPath:@"/System/Library/PrivateFrameworks/TextInputUI.framework"];
 						if (!bundle.loaded) [bundle load];
 
 						%init(thirteenPlus)

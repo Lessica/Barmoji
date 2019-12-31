@@ -14,7 +14,7 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
 
-	if([string length] > 0) {
+	if ([string length] > 0) {
 		if ([self isEmoji:string]) {
 			return YES;
 		} else {
@@ -32,7 +32,7 @@
     [characterRender sizeToFit];
 
     CGRect rect = [characterRender bounds];
-    UIGraphicsBeginImageContextWithOptions(rect.size,YES,0.0f);
+    UIGraphicsBeginImageContextWithOptions(rect.size, YES, 0.0f);
     CGContextRef contextSnap = UIGraphicsGetCurrentContext();
     [characterRender.layer renderInContext:contextSnap];
     UIImage *capturedImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -42,9 +42,9 @@
     NSUInteger width = CGImageGetWidth(imageRef);
     NSUInteger height = CGImageGetHeight(imageRef);
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    unsigned char *rawData = (unsigned char*) calloc(height * width * 4, sizeof(unsigned char));
+    unsigned char *rawData = (unsigned char *) calloc(height * width * 4, sizeof(unsigned char));
     NSUInteger bytesPerPixel = 4;
-    NSUInteger bytesPerRow = bytesPerPixel * width;
+    NSUInteger bytesPerRow = bytesPerPixel *width;
     NSUInteger bitsPerComponent = 8;
     CGContextRef context = CGBitmapContextCreate(rawData, width, height,
                                                  bitsPerComponent, bytesPerRow, colorSpace,

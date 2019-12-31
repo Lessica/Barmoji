@@ -7,8 +7,9 @@
 //
 
 @class UIKeyboardEmoji;
-@interface BarmojiEmojiCell: UICollectionViewCell
 
-@property (nonatomic,copy) UIKeyboardEmoji *emoji; 
+@interface BarmojiEmojiCell : UICollectionViewCell
+
+@property (nonatomic, copy) UIKeyboardEmoji *emoji; 
 
 @end

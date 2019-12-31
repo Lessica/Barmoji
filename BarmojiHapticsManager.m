@@ -25,25 +25,19 @@
     return sharedManager;
 }
 
-- (instancetype)init {
-    if(self = [super init]) {
-    }
-    return self;
-}
-
 - (void)actuateHapticsForType:(int)feedbackType {
 
-    if(feedbackType == 1) {
+    if (feedbackType == 1) {
         [self handleHapticFeedbackForSelection];
-    } else if(feedbackType == 2) {
+    } else if (feedbackType == 2) {
         [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleLight];
-    } else if(feedbackType == 3) {
+    } else if (feedbackType == 3) {
         [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleMedium];
-    } else if(feedbackType == 4) {
+    } else if (feedbackType == 4) {
         [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleHeavy];
-    } else if(feedbackType == 5) {
+    } else if (feedbackType == 5) {
         [self handleHapticFeedbackForSuccess];
-    } else if(feedbackType == 6) {
+    } else if (feedbackType == 6) {
         [self handleHapticFeedbackForWarning];
     }
 }
