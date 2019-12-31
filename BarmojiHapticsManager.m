@@ -26,19 +26,19 @@
 }
 
 - (void)actuateHapticsForType:(int)feedbackType {
-
-    if (feedbackType == 1) {
-        [self handleHapticFeedbackForSelection];
-    } else if (feedbackType == 2) {
-        [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleLight];
-    } else if (feedbackType == 3) {
-        [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleMedium];
-    } else if (feedbackType == 4) {
-        [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleHeavy];
-    } else if (feedbackType == 5) {
-        [self handleHapticFeedbackForSuccess];
-    } else if (feedbackType == 6) {
-        [self handleHapticFeedbackForWarning];
+    switch (feedbackType) {
+        case 1:
+            [self handleHapticFeedbackForSelection]; break;
+        case 2:
+            [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleLight]; break;
+        case 3:
+            [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleMedium]; break;
+        case 4:
+            [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleHeavy]; break;
+        case 5:
+            [self handleHapticFeedbackForSuccess]; break;
+        case 6:
+            [self handleHapticFeedbackForWarning]; break;
     }
 }
 
