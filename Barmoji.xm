@@ -44,7 +44,7 @@ int barmojiFeedbackType = 7;
 			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:predictionView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0]];
 
 			UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(flipSubviewHiddenStatus:)];
-			longPressGesture.minimumPressDuration = 1.0;
+			longPressGesture.minimumPressDuration = 0.25;
 			[self addGestureRecognizer:longPressGesture];
 		}
 	}
@@ -78,11 +78,31 @@ int barmojiFeedbackType = 7;
 %new
 - (void)flipSubviewHiddenStatus:(UILongPressGestureRecognizer *)recognizer {
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
-		showingBarmoji = !showingBarmoji;
-		for (UIView *subview in self.subviews) {
-			subview.hidden = !subview.hidden;
-			subview.userInteractionEnabled = !subview.userInteractionEnabled;
+		[self toggleBarmoji];
+	}
+}
+
+%new
+- (void)toggleBarmoji {
+	showingBarmoji = !showingBarmoji;
+	for (UIView *subview in self.subviews) {
+		subview.hidden = !subview.hidden;
+		subview.userInteractionEnabled = !subview.userInteractionEnabled;
+	}
+}
+
+- (void)setAutocorrectionList:(TIAutocorrectionList *)list animated:(BOOL)animated {
+    %orig;
+
+	TIKeyboardCandidateSingle *correction = list.autocorrection;
+	BOOL wantsCorrection = list.shouldAcceptTopCandidate || list.containsAutofillCandidates || list.containsProactiveTriggers;
+
+    if (wantsCorrection && ![correction.input isEqualToString:correction.candidate]) {
+		if (showingBarmoji) {
+			[self toggleBarmoji];
 		}
+    } else if (!showingBarmoji) {
+		[self toggleBarmoji];
 	}
 }
 
@@ -113,7 +133,7 @@ int barmojiFeedbackType = 7;
 			[predictionView addConstraint:[NSLayoutConstraint constraintWithItem:self.barmoji attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:predictionView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0]];
 
 			 UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(flipSubviewHiddenStatus:)];
-			 longPressGesture.minimumPressDuration = 1.0;
+			 longPressGesture.minimumPressDuration = 0.25;
 			 [self addGestureRecognizer:longPressGesture];
 		}
 	}
@@ -242,7 +262,7 @@ static void updateSettings(CFNotificationCenterRef center, void *observer, CFStr
 
 					loadPrefs();
 
-					if(IS_IOS_OR_NEWER(iOS_13_0)) {
+					if (@available(iOS 13, *)) {
 						
 						NSBundle* bundle = [NSBundle bundleWithPath:@"/System/Library/PrivateFrameworks/TextInputUI.framework"];
 						if (!bundle.loaded) [bundle load];

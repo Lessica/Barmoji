@@ -21,6 +21,7 @@
 
 @interface TUIPredictionView : UIView // iOS 13 +
 @property (nonatomic,retain) BarmojiCollectionView* barmoji;
+- (void)toggleBarmoji;
 @end
 
 @interface UIKeyboardImpl : UIView
@@ -61,4 +62,17 @@
 
 @interface UISystemKeyboardDockController : UIViewController
 @property (nonatomic,retain) UIKeyboardDockView* dockView;
+@end
+
+@interface TIKeyboardCandidateSingle : NSObject
+@property (readonly) NSString *candidate;
+@property (readonly) NSString *input;
+@end
+
+@interface TIAutocorrectionList : NSObject
+@property (readonly) NSArray *candidates;
+@property (readonly) TIKeyboardCandidateSingle *autocorrection;
+@property (readonly) BOOL containsProactiveTriggers;
+@property (readonly) BOOL containsAutofillCandidates;
+@property (readonly) BOOL shouldAcceptTopCandidate;
 @end
