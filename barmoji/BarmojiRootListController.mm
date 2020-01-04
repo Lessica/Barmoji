@@ -19,7 +19,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 
 - (instancetype)init {
     self = [super init];
-        if (self) {
+    if (self) {
         [self createDynamicSpecs];
     }
     return self;

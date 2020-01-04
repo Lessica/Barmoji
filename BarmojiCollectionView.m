@@ -121,7 +121,7 @@
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     CGFloat useableWidth = collectionView.frame.size.width / self.emojiPerRow;
-    return CGSizeMake(useableWidth, 34);
+    return CGSizeMake(useableWidth, 30);
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
