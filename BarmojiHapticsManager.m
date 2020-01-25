@@ -25,82 +25,76 @@
     return sharedManager;
 }
 
-- (instancetype)init {
-    if(self = [super init]) {
-    }
-    return self;
-}
-
 - (void)actuateHapticsForType:(int)feedbackType {
-
-    if(feedbackType == 1) {
-        [self handleHapticFeedbackForSelection];
-    } else if(feedbackType == 2) {
-        [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleLight];
-    } else if(feedbackType == 3) {
-        [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleMedium];
-    } else if(feedbackType == 4) {
-        [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleHeavy];
-    } else if(feedbackType == 5) {
-        [self handleHapticFeedbackForSuccess];
-    } else if(feedbackType == 6) {
-        [self handleHapticFeedbackForWarning];
+    switch (feedbackType) {
+        case 1:
+            [self handleHapticFeedbackForSelection]; break;
+        case 2:
+            [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleLight]; break;
+        case 3:
+            [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleMedium]; break;
+        case 4:
+            [self handleHapticFeedbackForImpactStyle:UIImpactFeedbackStyleHeavy]; break;
+        case 5:
+            [self handleHapticFeedbackForSuccess]; break;
+        case 6:
+            [self handleHapticFeedbackForWarning]; break;
     }
 }
 
 - (void)handleHapticFeedbackForImpactStyle:(UIImpactFeedbackStyle)style {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (@available(iOS 10.0, *)) {
+    if (@available(iOS 10.0, *)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             _hapticFeedbackGenerator = [[UIImpactFeedbackGenerator alloc] initWithStyle:style];
             [_hapticFeedbackGenerator prepare];
             [_hapticFeedbackGenerator impactOccurred];
             _hapticFeedbackGenerator = nil;
-        }
-    });
+        });
+    }
 }
 
 - (void)handleHapticFeedbackForError {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (@available(iOS 10.0, *)) {
+    if (@available(iOS 10.0, *)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             _hapticFeedbackGenerator = [[UINotificationFeedbackGenerator alloc] init];
             [_hapticFeedbackGenerator prepare];
             [_hapticFeedbackGenerator notificationOccurred:UINotificationFeedbackTypeError];
             _hapticFeedbackGenerator = nil;
-        }
-    });
+        });
+    }
 }
 
 - (void)handleHapticFeedbackForSelection {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (@available(iOS 10.0, *)) {
+    if (@available(iOS 10.0, *)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             _hapticFeedbackGenerator = [[UISelectionFeedbackGenerator alloc] init];
             [_hapticFeedbackGenerator prepare];
             [_hapticFeedbackGenerator selectionChanged];
             _hapticFeedbackGenerator = nil;
-        }
-    });
+        });
+    }
 }
 
 - (void)handleHapticFeedbackForSuccess {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (@available(iOS 10.0, *)) {
+    if (@available(iOS 10.0, *)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             _hapticFeedbackGenerator = [[UINotificationFeedbackGenerator alloc] init];
             [_hapticFeedbackGenerator prepare];
             [_hapticFeedbackGenerator notificationOccurred:UINotificationFeedbackTypeSuccess];
             _hapticFeedbackGenerator = nil;
-        }
-    });
+        });
+    }
 }
 
 - (void)handleHapticFeedbackForWarning {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (@available(iOS 10.0, *)) {
+    if (@available(iOS 10.0, *)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             _hapticFeedbackGenerator = [[UINotificationFeedbackGenerator alloc] init];
             [_hapticFeedbackGenerator prepare];
             [_hapticFeedbackGenerator notificationOccurred:UINotificationFeedbackTypeWarning];
             _hapticFeedbackGenerator = nil;
-        }
-    });
+        });
+    }
 }
 
 @end
