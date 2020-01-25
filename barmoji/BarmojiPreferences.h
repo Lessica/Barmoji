@@ -30,9 +30,6 @@
 
 #define kIsDemo NO
 
-#define MAIN_ICON_PATH               @"/Library/PreferenceBundles/Kairos2.bundle/images/Kairos2.png"
-#define HEADER_ICON               @"/Library/PreferenceBundles/Kairos2.bundle/images/headerLogo.png"
-
 #define buttonCellWithName(name) [PSSpecifier preferenceSpecifierNamed:name target:self set:NULL get:NULL detail:NULL cell:PSButtonCell edit:Nil]
 #define groupSpecifier(name) [PSSpecifier groupSpecifierWithName:name]
 #define subtitleSwitchCellWithName(name) [PSSpecifier preferenceSpecifierNamed:name target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NULL cell:PSSwitchCell edit:Nil]
