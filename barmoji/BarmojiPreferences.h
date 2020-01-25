@@ -28,6 +28,8 @@
 
 @end
 
+#define kIsDemo NO
+
 #define MAIN_ICON_PATH               @"/Library/PreferenceBundles/Kairos2.bundle/images/Kairos2.png"
 #define HEADER_ICON               @"/Library/PreferenceBundles/Kairos2.bundle/images/headerLogo.png"
 

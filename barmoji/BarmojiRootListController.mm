@@ -59,6 +59,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
         [mutableSpecifiers addObject:specifier];
 
         specifier = segmentCellWithName(@"Shown Emojis");
+        [specifier setProperty:(kIsDemo) ? @NO : @YES forKey:@"enabled"];
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
         [specifier setValues:@[@(1), @(2)] titles:@[@"Recent", @"Custom"]];
         setDefaultForSpec(@1);
@@ -82,6 +83,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
         [mutableSpecifiers addObject:specifier];
 
         specifier = subtitleSwitchCellWithName(@"Full Width");
+        [specifier setProperty:(kIsDemo) ? @NO : @YES forKey:@"enabled"];
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
         setKeyForSpec(@"BarmojiFullWidthBottom");
         [mutableSpecifiers addObject:specifier];
@@ -129,6 +131,23 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
         specifier = buttonCellWithName(@"Email Support");
         specifier->action = @selector(presentSupportMailController:);
         [mutableSpecifiers addObject:specifier];
+
+        if(kIsDemo) {
+			specifier = groupSpecifier(@"");
+			[specifier setProperty:@(0) forKey:@"footerAlignment"];
+			setFooterForSpec(@"\n\nBecome a supporter to unlock all configuration options. Learn more with the CPDD Connect app available on my repo or at https://cpdigitaldarkroom.com\n\n\n");
+			[mutableSpecifiers addObject:specifier];
+		}
+
+		specifier = groupSpecifier(@"");
+		[specifier setProperty:@(1) forKey:@"footerAlignment"];
+		setFooterForSpec(@"Barmoji v2020.1\nCopyright © 2020 CP Digital Darkroom");
+		[mutableSpecifiers addObject:specifier];
+
+        specifier = groupSpecifier(@"");
+		[specifier setProperty:@(1) forKey:@"footerAlignment"];
+		setFooterForSpec(@"\nSpecial thanks to NSExceptional for their contributions in making Barmoji better.");
+		[mutableSpecifiers addObject:specifier];
 
         _specifiers = [mutableSpecifiers copy];
     }
