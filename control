@@ -4,6 +4,8 @@ Depends: mobilesubstrate, preferenceloader
 Version: 2020.1
 Architecture: iphoneos-arm
 Description: Quick Emoji Access Bar
+Depiction: https://apt.cpdigitaldarkroom.com/depictions/com.cpdigitaldarkroom.barmoji/
+Homepage: https://apt.cpdigitaldarkroom.com/depictions/com.cpdigitaldarkroom.barmoji/
 Maintainer: CP Digital Darkroom <admin@cpdigitaldarkroom.com>
 Author: CP Digital Darkroom <admin@cpdigitaldarkroom.com>
 Section: Tweaks
