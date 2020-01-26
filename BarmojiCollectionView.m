@@ -125,7 +125,7 @@
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    if (self.replacingPredictiveBar || self.fullWidth) {
+    if (self.replacingPredictiveBar) {
         return UIEdgeInsetsZero;
     }
 
