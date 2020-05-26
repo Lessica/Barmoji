@@ -216,6 +216,18 @@ int barmojiFeedbackType = 7;
 
 %end // UIKeyboardDockView
 
+//Fix for barmoji view overlapping when dicatation is running
+%hook UISystemKeyboardDockController
+
+	-(void)updateDockItemsVisibility
+	{
+		%orig;
+
+		self.dockView.barmoji.hidden = self.dockView.centerDockItem ? !self.dockView.centerDockItem.view.hidden : NO;
+	}
+
+%end
+
 %end // common group
 
 static void loadPrefs() {
