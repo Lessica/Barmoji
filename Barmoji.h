@@ -57,6 +57,7 @@
 
 @interface UIKeyboardDockView : UIView
 @property (nonatomic, retain) BarmojiCollectionView *barmoji;
+ @property (nonatomic,retain) UIKeyboardDockItem * centerDockItem;
 - (id)_keyboardLayoutView;
 @end
 
