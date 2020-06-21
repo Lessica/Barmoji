@@ -10,6 +10,17 @@ Barmoji is available on public repo https://repo.cpdigitaldarkroom.com with the 
 
 ### Changelog
 
+2020.5
+- Changes by MiRO92
+- Add option to set emojis per row
+- Add option to adjust left and right offsets
+- Add option to set custom height for bottom bar
+- Removed full width option, just 0 left and right insets for full width
+- Add option to hide the globe button
+- Add option to hide the dictation button
+- Fix Barmoji being displayed during dictation
+- Fix Barmoji being displayed while in landscape bottom bar
+
 2020.1
  - Add option to have full width bottom bar
  - Fix layout issues on iOS 13
