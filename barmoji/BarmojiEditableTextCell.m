@@ -12,9 +12,11 @@
 @implementation BarmojiEditableTextCell
 - (id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3 {
 	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
+    /*
 	if (self) {
         [self textField].returnKeyType = UIReturnKeyDone;
     }
+     */
 	return self;
 }
 
