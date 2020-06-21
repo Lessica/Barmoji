@@ -14,7 +14,6 @@
 @interface BarmojiCollectionView () <UICollectionViewDataSource, UICollectionViewDelegate>
 
 @property (assign, nonatomic) UICollectionViewScrollDirection direction;
-@property (assign, nonatomic) BOOL fullWidth;
 @property (assign, nonatomic) BOOL replacingPredictiveBar;
 @property (assign, nonatomic) BOOL useCustomEmojis;
 @property (strong, nonatomic) NSArray *customEmojis;
@@ -31,10 +30,9 @@
     NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/private/var/mobile/Library/Preferences/com.cpdigitaldarkroom.barmoji.plist"];
 
     int emojiSource = ([prefs objectForKey:@"EmojiSource"] ? [[prefs objectForKey:@"EmojiSource"] intValue] : 1);
+    _emojiPerRow = ([prefs objectForKey:@"BarmojiEmojiPerRow"] ? [[prefs objectForKey:@"BarmojiEmojiPerRow"] intValue] : 6);
 
     _direction = ([[prefs objectForKey:@"BarmojiScrollDirection"] ?: @(UICollectionViewScrollDirectionHorizontal) integerValue]);
-    _emojiPerRow = 6;
-    _fullWidth = ([prefs objectForKey:@"BarmojiFullWidthBottom"] ? [[prefs objectForKey:@"BarmojiFullWidthBottom"] boolValue] : NO);
     _replacingPredictiveBar = forPredictive;
     _useCustomEmojis = (emojiSource == 2);
 
@@ -92,12 +90,38 @@
 
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     BOOL landscape = UIInterfaceOrientationIsLandscape(orientation);
+
+    /*
+    UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+    BOOL deviceLandscape = UIDeviceOrientationIsLandscape(deviceOrientation);
+    
+    BOOL isSpringBoard = NO;
+    NSArray *args = [[NSClassFromString(@"NSProcessInfo") processInfo] arguments];
+    
+    if (args.count != 0) {
+        NSString *executablePath = args[0];
+        if (executablePath) {
+            NSString *processName = [executablePath lastPathComponent];
+            isSpringBoard = [processName isEqualToString:@"SpringBoard"];
+        }
+    }
+    
+    
+    //NSLog(@"miroo: orientation is %d and deviceOrientation is %d", orientation, deviceOrientation);
     
     // We don't want it to disappear in landscape if we're replacing the predictive bar
+    if (isSpringBoard && !self.replacingPredictiveBar && !deviceLandscape)  {
+        self.alpha = 0;
+    } else if (landscape && !self.replacingPredictiveBar) {
+        self.alpha = 0;
+    } else {
+        self.alpha = 1;
+    }
+    */
     self.alpha = landscape && !self.replacingPredictiveBar ? 0 : 1;
     // Landscape gets 12 emojis in the predictive bar,
     // Portrait gets 8 in the predictive bar or 6 on the bottom
-    self.emojiPerRow = (landscape) ? 12 : ((self.replacingPredictiveBar || self.fullWidth ) ? 8 : 6);
+    //self.emojiPerRow = (landscape) ? 12 : ((self.replacingPredictiveBar || self.fullWidth ) ? 8 : 6);
     [self reloadData];
     
 }

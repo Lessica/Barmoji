@@ -1,15 +1,11 @@
-ifeq ($(SIMJECT),1)
-TARGET = simulator:clang:latest:8.0
-export ARCHS = x86_64
-else
-endif
-
-FINALPACKAGE = 1
+ARCHS = arm64 arm64e
+TARGET = iphone:clang::11.0
+PACKAGE_VERSION = $(THEOS_PACKAGE_BASE_VERSION)
 
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = Barmoji
-Barmoji_FILES = Barmoji.xm $(wildcard *.m)
+Barmoji_FILES = Barmoji.xm BarmojiCollectionView.m BarmojiEmojiCell.m BarmojiHapticsManager.m
 Barmoji_CFLAGS += -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk

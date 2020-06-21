@@ -23,9 +23,12 @@
 
         self.contentView.backgroundColor = [UIColor clearColor];
         self.backgroundColor = [UIColor clearColor];
+        
+        NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/private/var/mobile/Library/Preferences/com.cpdigitaldarkroom.barmoji.plist"];
+        int emojiFontSize = ([prefs objectForKey:@"EmojiFontSize"] ? [[prefs objectForKey:@"EmojiFontSize"] intValue] : 24);
 
         _emojiLabel = [[UILabel alloc] initWithFrame: CGRectZero];
-        _emojiLabel.font = [UIFont systemFontOfSize: 24];
+        _emojiLabel.font = [UIFont systemFontOfSize: emojiFontSize];
         _emojiLabel.textAlignment = NSTextAlignmentCenter;
         _emojiLabel.translatesAutoresizingMaskIntoConstraints = NO;
         [self.contentView addSubview: _emojiLabel];

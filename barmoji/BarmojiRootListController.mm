@@ -7,12 +7,15 @@
 //
 
 #import "BarmojiPreferences.h"
+#import "NSConcreteNotification.h" // for converting return key to dismiss the keyboard
 #include <spawn.h>
 
 extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void);
 
 @interface BarmojiRootListController : PSListController <MFMailComposeViewControllerDelegate>
-@property (strong, nonatomic) NSMutableArray *dynamicSpecs;
+@property (strong, nonatomic) NSMutableArray *dynamicSpecsEmojiSource;
+@property (strong, nonatomic) NSMutableArray *dynamicSpecsPredictiveBar;
+@property (strong, nonatomic) NSMutableArray *dynamicSpecsBottomBar;
 @end
 
 @implementation BarmojiRootListController
@@ -20,17 +23,20 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 - (instancetype)init {
     self = [super init];
     if (self) {
-        [self createDynamicSpecs];
+        [self createDynamicSpecsEmojiSource];
+        [self createDynamicSpecsPredictiveBar];
+        [self createDynamicSpecsBottomBar];
     }
     return self;
 }
 
-- (void)createDynamicSpecs {
-    PSSpecifier *specifier;
-    _dynamicSpecs = [NSMutableArray new];
+- (void)_returnKeyPressed:(NSConcreteNotification *)notification {
+    [self.view endEditing:YES];
+}
 
-    specifier = groupSpecifier(@"");
-    [_dynamicSpecs addObject:specifier];
+- (void)createDynamicSpecsEmojiSource {
+    PSSpecifier *specifier;
+    _dynamicSpecsEmojiSource = [NSMutableArray new];
 
     specifier = textEditCellWithName(@"Emojis:");
     setClassForSpec(NSClassFromString(@"BarmojiEditableTextCell"));
@@ -38,8 +44,64 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
     setDefaultForSpec(@"");
     setPlaceholderForSpec(@"Your Favorite Emojis");
     setKeyForSpec(@"CustomEmojis");
-    [_dynamicSpecs addObject:specifier];
+    [_dynamicSpecsEmojiSource addObject:specifier];
 }
+
+- (void)createDynamicSpecsPredictiveBar {
+    PSSpecifier *specifier;
+    _dynamicSpecsPredictiveBar = [NSMutableArray new];
+    
+    //specifier = groupSpecifier(@"Predictive Bar");
+    //setFooterForSpec(@"Replaces the text prediction bar with Barmoji, useful for non-iPhone X devices");
+    //[_dynamicSpecsPredictiveBar addObject:specifier];
+
+    specifier = [PSSpecifier preferenceSpecifierNamed:@"Scroll Direction" target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setKeyForSpec(@"BarmojiScrollDirection");
+    [specifier setValues:[self scrollDirectionValues] titles:[self scrollDirectionTitles] shortTitles:[self scrollDirectionShortTitles]];
+    [_dynamicSpecsPredictiveBar addObject:specifier];
+}
+
+- (void)createDynamicSpecsBottomBar {
+    PSSpecifier *specifier;
+    _dynamicSpecsBottomBar = [NSMutableArray new];
+
+    //specifier = groupSpecifier(@"Bottom Bar");
+    //setFooterForSpec(@"Default Values:\nLeft Offset = 60\nRight Offset = -60\nEmojis Height = -20\nFor full width set Left Offset = 0 and Right Offset = 0.");
+    //[_dynamicSpecsBottomBar addObject:specifier];
+    
+    specifier = textEditCellWithName(@"Left Offset:");
+    setClassForSpec(NSClassFromString(@"PSEditableTableCell"));
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setDefaultForSpec(@"60");
+    setKeyForSpec(@"BarmojiBottomLeading");
+    [_dynamicSpecsBottomBar addObject:specifier];
+    
+    specifier = textEditCellWithName(@"Right Offset:");
+    setClassForSpec(NSClassFromString(@"PSEditableTableCell"));
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setDefaultForSpec(@"-60");
+    setKeyForSpec(@"BarmojiBottomTrailing");
+    [_dynamicSpecsBottomBar addObject:specifier];
+
+    specifier = textEditCellWithName(@"Emojis Height:");
+    setClassForSpec(NSClassFromString(@"PSEditableTableCell"));
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setDefaultForSpec(@"-20");
+    setKeyForSpec(@"BarmojiBottomHeight");
+    [_dynamicSpecsBottomBar addObject:specifier];
+    
+    specifier = subtitleSwitchCellWithName(@"Hide Globe Button");
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setKeyForSpec(@"BarmojiHideGlobe");
+    [_dynamicSpecsBottomBar addObject:specifier];
+
+    specifier = subtitleSwitchCellWithName(@"Hide Dictation Button");
+    [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
+    setKeyForSpec(@"BarmojiHideDictation");
+    [_dynamicSpecsBottomBar addObject:specifier];
+}
+
 
 - (id)specifiers {
     if (_specifiers == nil) {
@@ -68,53 +130,56 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 
         int sourceType = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("EmojiSource"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
         if (sourceType == 2) {
-            for(PSSpecifier *sp in _dynamicSpecs) {
+            for(PSSpecifier *sp in _dynamicSpecsEmojiSource) {
                 [mutableSpecifiers addObject:sp];
             }
         }
-
-        specifier = groupSpecifier(@"Bottom Bar");
-        setFooterForSpec(@"The default Barmoji implementation for iPhone X or devices who have enabled the iPhone X layout.");
+        
+        specifier = groupSpecifier(@"Emojis Per Row");
+        setFooterForSpec(@"Choose how many emojis showing per row.\nDefault Font Size = 24");
         [mutableSpecifiers addObject:specifier];
-
-        specifier = subtitleSwitchCellWithName(@"Enabled");
+        
+        specifier = segmentCellWithName(@"Emoji Per Row");
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
-        setKeyForSpec(@"BarmojiBottomEnabled");
+        [specifier setValues:@[@(4), @(5), @(6), @(7), @(8), @(9)] titles:@[@"4", @"5", @"6", @"7", @"8", @"9"]];
+        setDefaultForSpec(@6);
+        setKeyForSpec(@"BarmojiEmojiPerRow");
         [mutableSpecifiers addObject:specifier];
-
-        specifier = subtitleSwitchCellWithName(@"Full Width");
-        [specifier setProperty:(kIsDemo) ? @NO : @YES forKey:@"enabled"];
+        
+        specifier = textEditCellWithName(@"Font Size:");
+        setClassForSpec(NSClassFromString(@"PSEditableTableCell"));
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
-        setKeyForSpec(@"BarmojiFullWidthBottom");
+        setDefaultForSpec(@"24");
+        setKeyForSpec(@"EmojiFontSize");
         [mutableSpecifiers addObject:specifier];
-
-        specifier = groupSpecifier(@"Predictive Bar");
-        setFooterForSpec(@"Replaces the text prediction bar with Barmoji, useful for non-iPhone X devices");
-        [mutableSpecifiers addObject:specifier];
-
-        specifier = subtitleSwitchCellWithName(@"Enabled");
-        [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
-        setKeyForSpec(@"BarmojiPredictiveEnabled");
-        [mutableSpecifiers addObject:specifier];
-
-        specifier = groupSpecifier(@"Haptic Feedback");
-        [mutableSpecifiers addObject:specifier];
-
-        specifier = [PSSpecifier preferenceSpecifierNamed:@"Feedback Type" target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
+        
+        specifier = [PSSpecifier preferenceSpecifierNamed:@"Haptic Feedback Type" target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
         setKeyForSpec(@"BarmojiFeedbackType");
         [specifier setValues:[self activationTypeValues] titles:[self activationTypeTitles] shortTitles:[self activationTypeShortTitles]];
         [mutableSpecifiers addObject:specifier];
-
-        specifier = groupSpecifier(@"Layout");
-        setFooterForSpec(@"Scroll direction only applies to the Predictive Bar location.");
+        
+        specifier = groupSpecifier(@"Emojis Position");
+        setFooterForSpec(@"Default Values:\nLeft Offset = 60\nRight Offset = -60\nEmojis Height = -20\nFor full width set Left Offset = 0 and Right Offset = 0.");
         [mutableSpecifiers addObject:specifier];
 
-        specifier = [PSSpecifier preferenceSpecifierNamed:@"Scroll Direction" target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
+        specifier = segmentCellWithName(@"Emojis Position");
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
-        setKeyForSpec(@"BarmojiScrollDirection");
-        [specifier setValues:[self scrollDirectionValues] titles:[self scrollDirectionTitles] shortTitles:[self scrollDirectionShortTitles]];
+        [specifier setValues:@[@(1), @(2)] titles:@[@"Predictive Bar", @"Bottom Bar"]];
+        setDefaultForSpec(@1);
+        setKeyForSpec(@"EmojisPosition");
         [mutableSpecifiers addObject:specifier];
+
+        int emojisPositionType = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("EmojisPosition"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+        if (emojisPositionType == 2) {
+            for(PSSpecifier *sp in _dynamicSpecsBottomBar) {
+                [mutableSpecifiers addObject:sp];
+            }
+        } else {
+            for(PSSpecifier *sp in _dynamicSpecsPredictiveBar) {
+                [mutableSpecifiers addObject:sp];
+            }
+        }
 
         specifier = groupSpecifier(@"");
         setFooterForSpec(@"A respring is required to fully apply setting changes");
@@ -141,7 +206,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 
 		specifier = groupSpecifier(@"");
 		[specifier setProperty:@(1) forKey:@"footerAlignment"];
-		setFooterForSpec(@"Barmoji v2020.1\nCopyright © 2020 CP Digital Darkroom");
+		setFooterForSpec(@"Barmoji v2020.4.4\nCopyright © 2020 CP Digital Darkroom");
 		[mutableSpecifiers addObject:specifier];
 
         specifier = groupSpecifier(@"");
@@ -246,19 +311,35 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
         BOOL shouldShow = [value intValue] == 2;
         [self shouldShowCustomEmojiSpecifiers:shouldShow];
     }
+    
+    if ([key isEqualToString:@"EmojisPosition"]) {
+        BOOL shouldShowPredictiveBar = [value intValue] == 1;
+        [self shouldShowEmojiPositionSpecifiers:shouldShowPredictiveBar];
+    }
 
     int feedbackType = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiFeedbackType"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
-    BOOL bottom = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiBottomEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
     BOOL enabled = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
-    BOOL fullWidth = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiFullWidthBottom"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
-    BOOL predictive = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiPredictiveEnabled"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
+    int barmojiBottomLeading = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiBottomLeading"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+    int barmojiBottomTrailing = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiBottomTrailing"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+    int barmojiBottomHeight = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiBottomHeight"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+    int barmojiEmojiPerRow = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiEmojiPerRow"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+    int barmojiEmojiFontSize = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("EmojiFontSize"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+    BOOL barmojiHideGlobe = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiHideGlobe"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
+    BOOL barmojiHideDictation = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiHideDictation"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
+    int barmojiEmojisPosition = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("EmojisPosition"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+
 
     NSDictionary *dictionary = @{
         @"feedbackType": @(feedbackType),
-        @"fullwidth": @(fullWidth),
-        @"bottom": @(bottom),
         @"enabled": @(enabled),
-        @"predictive": @(predictive)
+        @"BarmojiBottomLeading": @(barmojiBottomLeading),
+        @"BarmojiBottomTrailing": @(barmojiBottomTrailing),
+        @"BarmojiBottomHeight": @(barmojiBottomHeight),
+        @"BarmojiEmojiPerRow": @(barmojiEmojiPerRow),
+        @"EmojiFontSize": @(barmojiEmojiFontSize),
+        @"BarmojiHideGlobe": @(barmojiHideGlobe),
+        @"BarmojiHideDictation": @(barmojiHideDictation),
+        @"EmojisPosition": @(barmojiEmojisPosition)
     };
     CFNotificationCenterPostNotification(
         CFNotificationCenterGetDistributedCenter(),
@@ -268,9 +349,19 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 
 - (void)shouldShowCustomEmojiSpecifiers:(BOOL)show {
     if (show) {
-        [self insertContiguousSpecifiers:_dynamicSpecs afterSpecifierID:@"EmojiSource" animated:YES];
+        [self insertContiguousSpecifiers:_dynamicSpecsEmojiSource afterSpecifierID:@"EmojiSource" animated:YES];
     } else {
-        [self removeContiguousSpecifiers:_dynamicSpecs animated:YES];
+        [self removeContiguousSpecifiers:_dynamicSpecsEmojiSource animated:YES];
+    }
+}
+
+- (void)shouldShowEmojiPositionSpecifiers:(BOOL)show {
+    if (show) {
+        [self insertContiguousSpecifiers:_dynamicSpecsPredictiveBar afterSpecifierID:@"EmojisPosition" animated:YES];
+        [self removeContiguousSpecifiers:_dynamicSpecsBottomBar animated:YES];
+    } else {
+        [self insertContiguousSpecifiers:_dynamicSpecsBottomBar afterSpecifierID:@"EmojisPosition" animated:YES];
+        [self removeContiguousSpecifiers:_dynamicSpecsPredictiveBar animated:YES];
     }
 }
 
