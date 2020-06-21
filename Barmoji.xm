@@ -184,7 +184,12 @@ int barmojiEmojiPerRow = 6;
     UIKeyboardDockView *dockView = %orig;
     if (dockView) {
         if (barmojiEmojisPosition == 2) {
+
+            UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+            BOOL deviceLandscape = UIDeviceOrientationIsLandscape(deviceOrientation);
+
             self.barmoji = [[BarmojiCollectionView alloc] initForPredictiveBar:NO];
+            self.alpha = deviceLandscape ? 0.0 : 1.0;
             self.barmoji.feedbackType = barmojiFeedbackType;
             self.barmoji.translatesAutoresizingMaskIntoConstraints = NO;
             [dockView addSubview:self.barmoji];
@@ -216,14 +221,10 @@ int barmojiEmojiPerRow = 6;
 
 //Fix for barmoji view overlapping when dicatation is running
 %hook UISystemKeyboardDockController
-
-	-(void)updateDockItemsVisibility
-	{
-		%orig;
-
-		self.dockView.barmoji.hidden = self.dockView.centerDockItem ? !self.dockView.centerDockItem.view.hidden : NO;
-	}
-
+- (void)updateDockItemsVisibility {
+    %orig;
+    self.dockView.barmoji.hidden = self.dockView.centerDockItem ? !self.dockView.centerDockItem.view.hidden : NO;
+}
 %end
 
 %end // common group

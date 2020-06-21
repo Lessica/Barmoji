@@ -197,7 +197,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
         specifier->action = @selector(presentSupportMailController:);
         [mutableSpecifiers addObject:specifier];
 
-        if(kIsDemo) {
+        if (kIsDemo) {
 			specifier = groupSpecifier(@"");
 			[specifier setProperty:@(0) forKey:@"footerAlignment"];
 			setFooterForSpec(@"\n\nBecome a supporter to unlock all configuration options. Learn more with the CPDD Connect app available on my repo or at https://cpdigitaldarkroom.com\n\n\n");

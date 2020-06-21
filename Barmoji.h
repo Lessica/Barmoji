@@ -53,6 +53,7 @@
 
 @interface UIKeyboardDockItem : NSObject
 @property (nonatomic, retain) UIKeyboardDockItemButton *button; 
+@property (nonatomic,readonly) UIKeyboardDockItemButton * view; 
 @end
 
 @interface UIKeyboardDockView : UIView
