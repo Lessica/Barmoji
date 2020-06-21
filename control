@@ -1,7 +1,7 @@
 Package: com.cpdigitaldarkroom.barmoji
 Name: Barmoji
 Depends: mobilesubstrate, preferenceloader
-Version: 2020.4.4
+Version: 2020.5
 Architecture: iphoneos-arm
 Description: Quick Emoji Access Bar
 Depiction: https://apt.cpdigitaldarkroom.com/depictions/com.cpdigitaldarkroom.barmoji/

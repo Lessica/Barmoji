@@ -206,12 +206,12 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 
 		specifier = groupSpecifier(@"");
 		[specifier setProperty:@(1) forKey:@"footerAlignment"];
-		setFooterForSpec(@"Barmoji v2020.4.4\nCopyright © 2020 CP Digital Darkroom");
+		setFooterForSpec(@"Barmoji v2020.5 \nCopyright © 2020 CP Digital Darkroom");
 		[mutableSpecifiers addObject:specifier];
 
         specifier = groupSpecifier(@"");
 		[specifier setProperty:@(1) forKey:@"footerAlignment"];
-		setFooterForSpec(@"\nSpecial thanks to NSExceptional for their contributions in making Barmoji better.");
+		setFooterForSpec(@"\nSpecial thanks to MiRO92, NSExceptional, p2kdev for their contributions in making Barmoji better.");
 		[mutableSpecifiers addObject:specifier];
 
         _specifiers = [mutableSpecifiers copy];
