@@ -53,10 +53,12 @@
 
 @interface UIKeyboardDockItem : NSObject
 @property (nonatomic, retain) UIKeyboardDockItemButton *button; 
+@property (nonatomic,readonly) UIKeyboardDockItemButton * view; 
 @end
 
 @interface UIKeyboardDockView : UIView
 @property (nonatomic, retain) BarmojiCollectionView *barmoji;
+ @property (nonatomic,retain) UIKeyboardDockItem * centerDockItem;
 - (id)_keyboardLayoutView;
 @end
 
