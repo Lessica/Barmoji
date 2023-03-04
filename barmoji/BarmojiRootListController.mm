@@ -8,7 +8,7 @@
 
 #import "BarmojiPreferences.h"
 #import "NSConcreteNotification.h" // for converting return key to dismiss the keyboard
-#include <spawn.h>
+#import <spawn.h>
 
 extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void);
 
@@ -19,6 +19,10 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 @end
 
 @implementation BarmojiRootListController
+
+- (NSBundle *)bundle {
+    return [NSBundle bundleForClass:[self class]];
+}
 
 - (instancetype)init {
     self = [super init];
@@ -38,7 +42,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
     PSSpecifier *specifier;
     _dynamicSpecsEmojiSource = [NSMutableArray new];
 
-    specifier = textEditCellWithName(@"Emojis:");
+    specifier = textEditCellWithName(NSLocalizedStringFromTableInBundle(@"Emojis", nil, self.bundle, nil));
     setClassForSpec(NSClassFromString(@"BarmojiEditableTextCell"));
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
     setDefaultForSpec(@"");
@@ -51,11 +55,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
     PSSpecifier *specifier;
     _dynamicSpecsPredictiveBar = [NSMutableArray new];
     
-    //specifier = groupSpecifier(@"Predictive Bar");
-    //setFooterForSpec(@"Replaces the text prediction bar with Barmoji, useful for non-iPhone X devices");
-    //[_dynamicSpecsPredictiveBar addObject:specifier];
-
-    specifier = [PSSpecifier preferenceSpecifierNamed:@"Scroll Direction" target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
+    specifier = [PSSpecifier preferenceSpecifierNamed:NSLocalizedStringFromTableInBundle(@"Scroll Direction", nil, self.bundle, nil) target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
     setKeyForSpec(@"BarmojiScrollDirection");
     [specifier setValues:[self scrollDirectionValues] titles:[self scrollDirectionTitles] shortTitles:[self scrollDirectionShortTitles]];
@@ -66,37 +66,33 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
     PSSpecifier *specifier;
     _dynamicSpecsBottomBar = [NSMutableArray new];
 
-    //specifier = groupSpecifier(@"Bottom Bar");
-    //setFooterForSpec(@"Default Values:\nLeft Offset = 60\nRight Offset = -60\nEmojis Height = -20\nFor full width set Left Offset = 0 and Right Offset = 0.");
-    //[_dynamicSpecsBottomBar addObject:specifier];
-    
-    specifier = textEditCellWithName(@"Left Offset:");
+    specifier = textEditCellWithName(NSLocalizedStringFromTableInBundle(@"Left Offset", nil, self.bundle, nil));
     setClassForSpec(NSClassFromString(@"PSEditableTableCell"));
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
     setDefaultForSpec(@"60");
     setKeyForSpec(@"BarmojiBottomLeading");
     [_dynamicSpecsBottomBar addObject:specifier];
     
-    specifier = textEditCellWithName(@"Right Offset:");
+    specifier = textEditCellWithName(NSLocalizedStringFromTableInBundle(@"Right Offset", nil, self.bundle, nil));
     setClassForSpec(NSClassFromString(@"PSEditableTableCell"));
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
     setDefaultForSpec(@"-60");
     setKeyForSpec(@"BarmojiBottomTrailing");
     [_dynamicSpecsBottomBar addObject:specifier];
 
-    specifier = textEditCellWithName(@"Emojis Height:");
+    specifier = textEditCellWithName(NSLocalizedStringFromTableInBundle(@"Emojis Height", nil, self.bundle, nil));
     setClassForSpec(NSClassFromString(@"PSEditableTableCell"));
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
     setDefaultForSpec(@"-20");
     setKeyForSpec(@"BarmojiBottomHeight");
     [_dynamicSpecsBottomBar addObject:specifier];
     
-    specifier = subtitleSwitchCellWithName(@"Hide Globe Button");
+    specifier = subtitleSwitchCellWithName(NSLocalizedStringFromTableInBundle(@"Hide Globe Button", nil, self.bundle, nil));
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
     setKeyForSpec(@"BarmojiHideGlobe");
     [_dynamicSpecsBottomBar addObject:specifier];
 
-    specifier = subtitleSwitchCellWithName(@"Hide Dictation Button");
+    specifier = subtitleSwitchCellWithName(NSLocalizedStringFromTableInBundle(@"Hide Dictation Button", nil, self.bundle, nil));
     [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
     setKeyForSpec(@"BarmojiHideDictation");
     [_dynamicSpecsBottomBar addObject:specifier];
@@ -112,18 +108,18 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
         specifier = groupSpecifier(@"");
         [mutableSpecifiers addObject:specifier];
 
-        specifier = subtitleSwitchCellWithName(@"Enabled");
+        specifier = subtitleSwitchCellWithName(NSLocalizedStringFromTableInBundle(@"Enabled", nil, self.bundle, nil));
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
         setKeyForSpec(@"BarmojiEnabled");
         [mutableSpecifiers addObject:specifier];
 
-        specifier = groupSpecifier(@"Shown Emojis");
+        specifier = groupSpecifier(NSLocalizedStringFromTableInBundle(@"Shown Emojis", nil, self.bundle, nil));
         [mutableSpecifiers addObject:specifier];
 
-        specifier = segmentCellWithName(@"Shown Emojis");
-        [specifier setProperty:(kIsDemo) ? @NO : @YES forKey:@"enabled"];
+        specifier = segmentCellWithName(NSLocalizedStringFromTableInBundle(@"Shown Emojis", nil, self.bundle, nil));
+        [specifier setProperty:@YES forKey:@"enabled"];
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
-        [specifier setValues:@[@(1), @(2)] titles:@[@"Recent", @"Custom"]];
+        [specifier setValues:@[@(1), @(2)] titles:@[NSLocalizedStringFromTableInBundle(@"Recent", nil, self.bundle, nil), NSLocalizedStringFromTableInBundle(@"Custom", nil, self.bundle, nil)]];
         setDefaultForSpec(@1);
         setKeyForSpec(@"EmojiSource");
         [mutableSpecifiers addObject:specifier];
@@ -135,83 +131,70 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
             }
         }
         
-        specifier = groupSpecifier(@"Emojis Per Row");
-        setFooterForSpec(@"Choose how many emojis showing per row.\nDefault Font Size = 24");
+        specifier = groupSpecifier(NSLocalizedStringFromTableInBundle(@"Emojis Per Row", nil, self.bundle, nil));
+        setFooterForSpec(NSLocalizedStringFromTableInBundle(@"Choose how many emojis showing per row.\nDefault Font Size = 24", nil, self.bundle, nil));
         [mutableSpecifiers addObject:specifier];
         
-        specifier = segmentCellWithName(@"Emoji Per Row");
+        specifier = segmentCellWithName(NSLocalizedStringFromTableInBundle(@"Emoji Per Row", nil, self.bundle, nil));
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
         [specifier setValues:@[@(4), @(5), @(6), @(7), @(8), @(9)] titles:@[@"4", @"5", @"6", @"7", @"8", @"9"]];
         setDefaultForSpec(@6);
         setKeyForSpec(@"BarmojiEmojiPerRow");
         [mutableSpecifiers addObject:specifier];
         
-        specifier = textEditCellWithName(@"Font Size:");
+        specifier = textEditCellWithName(NSLocalizedStringFromTableInBundle(@"Font Size", nil, self.bundle, nil));
         setClassForSpec(NSClassFromString(@"PSEditableTableCell"));
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
         setDefaultForSpec(@"24");
         setKeyForSpec(@"EmojiFontSize");
         [mutableSpecifiers addObject:specifier];
         
-        specifier = [PSSpecifier preferenceSpecifierNamed:@"Haptic Feedback Type" target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
+        specifier = [PSSpecifier preferenceSpecifierNamed:NSLocalizedStringFromTableInBundle(@"Haptic Feedback Type", nil, self.bundle, nil) target:self set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:NSClassFromString(@"BarmojiListItemsController") cell:PSLinkListCell edit:nil];
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
         setKeyForSpec(@"BarmojiFeedbackType");
         [specifier setValues:[self activationTypeValues] titles:[self activationTypeTitles] shortTitles:[self activationTypeShortTitles]];
         [mutableSpecifiers addObject:specifier];
         
-        specifier = groupSpecifier(@"Emojis Position");
-        setFooterForSpec(@"Default Values:\nLeft Offset = 60\nRight Offset = -60\nEmojis Height = -20\nFor full width set Left Offset = 0 and Right Offset = 0.");
+        specifier = groupSpecifier(NSLocalizedStringFromTableInBundle(@"Emojis Position", nil, self.bundle, nil));
+        setFooterForSpec(NSLocalizedStringFromTableInBundle(@"Default Values:\nLeft Offset = 60\nRight Offset = -60\nEmojis Height = -20\nFor full width set Left Offset = 0 and Right Offset = 0.", nil, self.bundle, nil));
         [mutableSpecifiers addObject:specifier];
 
-        specifier = segmentCellWithName(@"Emojis Position");
+        specifier = segmentCellWithName(NSLocalizedStringFromTableInBundle(@"Emojis Position", nil, self.bundle, nil));
         [specifier setProperty:@"com.cpdigitaldarkroom.barmoji" forKey:@"defaults"];
-        [specifier setValues:@[@(1), @(2)] titles:@[@"Predictive Bar", @"Bottom Bar"]];
-        setDefaultForSpec(@1);
+        [specifier setValues:@[@(2)] titles:@[NSLocalizedStringFromTableInBundle(@"Bottom Bar", nil, self.bundle, nil)]];
+        setDefaultForSpec(@2);
         setKeyForSpec(@"EmojisPosition");
         [mutableSpecifiers addObject:specifier];
 
         int emojisPositionType = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("EmojisPosition"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
+        emojisPositionType = 2;
+        
         if (emojisPositionType == 2) {
-            for(PSSpecifier *sp in _dynamicSpecsBottomBar) {
+            for (PSSpecifier *sp in _dynamicSpecsBottomBar) {
                 [mutableSpecifiers addObject:sp];
             }
         } else {
-            for(PSSpecifier *sp in _dynamicSpecsPredictiveBar) {
+            for (PSSpecifier *sp in _dynamicSpecsPredictiveBar) {
                 [mutableSpecifiers addObject:sp];
             }
         }
 
         specifier = groupSpecifier(@"");
-        setFooterForSpec(@"A respring is required to fully apply setting changes");
+        setFooterForSpec(NSLocalizedStringFromTableInBundle(@"A respring is required to fully apply setting changes.", nil, self.bundle, nil));
         [mutableSpecifiers addObject:specifier];
 
-        specifier = buttonCellWithName(@"Respring");
+        specifier = buttonCellWithName(NSLocalizedStringFromTableInBundle(@"Respring", nil, self.bundle, nil));
         specifier->action = @selector(respring);
         [mutableSpecifiers addObject:specifier];
 
-        specifier = groupSpecifier(@"Support");
-        setFooterForSpec(@"Having Trouble? Get in touch and I'll help when I can");
-        [mutableSpecifiers addObject:specifier];
-
-        specifier = buttonCellWithName(@"Email Support");
-        specifier->action = @selector(presentSupportMailController:);
-        [mutableSpecifiers addObject:specifier];
-
-        if (kIsDemo) {
-			specifier = groupSpecifier(@"");
-			[specifier setProperty:@(0) forKey:@"footerAlignment"];
-			setFooterForSpec(@"\n\nBecome a supporter to unlock all configuration options. Learn more with the CPDD Connect app available on my repo or at https://cpdigitaldarkroom.com\n\n\n");
-			[mutableSpecifiers addObject:specifier];
-		}
-
 		specifier = groupSpecifier(@"");
 		[specifier setProperty:@(1) forKey:@"footerAlignment"];
-		setFooterForSpec(@"Barmoji v2020.5 \nCopyright © 2020 CP Digital Darkroom");
+		setFooterForSpec(NSLocalizedStringFromTableInBundle(@"Barmoji v2023.3\nCopyright © 2020-2023 CP Digital Darkroom", nil, self.bundle, nil));
 		[mutableSpecifiers addObject:specifier];
 
         specifier = groupSpecifier(@"");
 		[specifier setProperty:@(1) forKey:@"footerAlignment"];
-		setFooterForSpec(@"\nSpecial thanks to MiRO92, NSExceptional, p2kdev for their contributions in making Barmoji better.");
+		setFooterForSpec(NSLocalizedStringFromTableInBundle(@"\nSpecial thanks to MiRO92, NSExceptional, p2kdev for their contributions in making Barmoji better.", nil, self.bundle, nil));
 		[mutableSpecifiers addObject:specifier];
 
         _specifiers = [mutableSpecifiers copy];
@@ -222,25 +205,25 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 
 - (NSArray *)activationTypeShortTitles {
     return @[
-        @"None",
-        @"Extra Light",
-        @"Light",
-        @"Medium",
-        @"Strong",
-        @"Strong 2",
-        @"Strong 3"
+        NSLocalizedStringFromTableInBundle(@"None", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Extra Light", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Light", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Medium", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Strong", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Strong 2", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Strong 3", nil, self.bundle, nil)
     ];
 }
 
 - (NSArray *)activationTypeTitles {
     return @[
-        @"None",
-        @"Extra Light",
-        @"Light",
-        @"Medium",
-        @"Strong",
-        @"Strong 2",
-        @"Strong 3"
+        NSLocalizedStringFromTableInBundle(@"None", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Extra Light", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Light", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Medium", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Strong", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Strong 2", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Strong 3", nil, self.bundle, nil)
     ];
 }
 
@@ -256,7 +239,8 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
 
 - (NSArray *)scrollDirectionTitles {
     return @[
-        @"Horizontal", @"Vertical"
+        NSLocalizedStringFromTableInBundle(@"Horizontal", nil, self.bundle, nil),
+        NSLocalizedStringFromTableInBundle(@"Vertical", nil, self.bundle, nil)
     ];
 }
 
@@ -264,36 +248,6 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
     return @[
         @(UICollectionViewScrollDirectionHorizontal), @(UICollectionViewScrollDirectionVertical)
     ];
-}
-
-- (void)presentSupportMailController:(PSSpecifier *)spec {
-
-    MFMailComposeViewController *composeViewController = [[MFMailComposeViewController alloc] init];
-    [composeViewController setSubject:@"Barmoji Support"];
-    [composeViewController setToRecipients:[NSArray arrayWithObjects:@"CP Digital Darkroom <tweaks@cpdigitaldarkroom.support>", nil]];
-
-    NSString *product = nil, *version = nil, *build = nil;
-    product = (__bridge NSString *)MGCopyAnswer(kMGProductType, nil);
-    version = (__bridge NSString *)MGCopyAnswer(kMGProductVersion, nil);
-    build = (__bridge NSString *)MGCopyAnswer(kMGBuildVersion, nil);
-
-    [composeViewController setMessageBody:[NSString stringWithFormat:@"\n\nCurrent Device: %@, iOS %@ (%@)", product, version, build] isHTML:NO];
-
-    NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath: @"/bin/sh"];
-    [task setArguments:@[@"-c", [NSString stringWithFormat:@"dpkg -l"]]];
-
-    NSPipe *pipe = [NSPipe pipe];
-    [task setStandardOutput:pipe];
-    [task launch];
-
-    NSData *data = [task.standardOutput fileHandleForReading].readDataToEndOfFile;
-
-    [composeViewController addAttachmentData:data mimeType:@"text/plain" fileName:@"dpkgl.txt"];
-
-    [self.navigationController presentViewController:composeViewController animated:YES completion:nil];
-    composeViewController.mailComposeDelegate = self;
-
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
@@ -327,7 +281,7 @@ extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void
     BOOL barmojiHideGlobe = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiHideGlobe"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
     BOOL barmojiHideDictation = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("BarmojiHideDictation"), CFSTR("com.cpdigitaldarkroom.barmoji"))) boolValue];
     int barmojiEmojisPosition = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("EmojisPosition"), CFSTR("com.cpdigitaldarkroom.barmoji"))) intValue];
-
+    barmojiEmojisPosition = 2;
 
     NSDictionary *dictionary = @{
         @"feedbackType": @(feedbackType),

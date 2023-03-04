@@ -1,5 +1,7 @@
-TARGET = :clang:11.2:7.0
-ARCHS = arm64 arm64e
+export TARGET = iphone:clang:15.4.1:13.0
+export ARCHS = arm64 arm64e
+
+GO_EASY_ON_ME = 1
 
 include $(THEOS)/makefiles/common.mk
 
@@ -9,7 +11,7 @@ Barmoji_INSTALL_PATH = /Library/PreferenceBundles
 Barmoji_FRAMEWORKS = UIKit MessageUI Social CoreGraphics
 Barmoji_PRIVATE_FRAMEWORKS = Preferences
 Barmoji_LDFLAGS = -lMobileGestalt
-Barmoji_CFLAGS += -fobjc-arc
+Barmoji_CFLAGS += -fobjc-arc -include prefix.pch
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

@@ -157,7 +157,6 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-
     if (self.feedbackType != 7) {
         [[BarmojiHapticsManager sharedManager] actuateHapticsForType:self.feedbackType];
     }
@@ -170,7 +169,24 @@
         pressedEmoji = [self.emojiManager recents][indexPath.row];
     }
 
-    [[NSClassFromString(@"UIKeyboardImpl") activeInstance] insertText:pressedEmoji.emojiString];
+    NSString *pbs = pressedEmoji.emojiString;
+    static Class UIKeyboardImpl_CLASS = nil;
+    if (!UIKeyboardImpl_CLASS) {
+        UIKeyboardImpl_CLASS = NSClassFromString(@"UIKeyboardImpl");
+    }
+    UIKeyboardImpl *kb = [UIKeyboardImpl_CLASS activeInstance];
+    if (@available(iOS 15.0, *)) {
+        UIKBInputDelegateManager* delegateManager = [kb inputDelegateManager];
+        [delegateManager insertText:pbs];
+        if ([delegateManager respondsToSelector:@selector(clearForwardingInputDelegateAndResign:)])
+            [delegateManager clearForwardingInputDelegateAndResign:YES];
+        [kb updateReturnKey];
+    } else {
+        [kb insertText:pbs];
+        if ([kb respondsToSelector:@selector(clearForwardingInputDelegateAndResign:)])
+            [kb clearForwardingInputDelegateAndResign:YES];
+        [kb updateReturnKey];
+    }
 }
 
 @end

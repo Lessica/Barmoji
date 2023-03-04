@@ -28,7 +28,10 @@
 
 @end
 
-#define kIsDemo NO
+@interface PSSpecifier (Barmoji)
+- (void)setValues:(id)arg1 titles:(id)arg2;
+- (void)setValues:(id)arg1 titles:(id)arg2 shortTitles:(id)arg3;
+@end
 
 #define buttonCellWithName(name) [PSSpecifier preferenceSpecifierNamed:name target:self set:NULL get:NULL detail:NULL cell:PSButtonCell edit:Nil]
 #define groupSpecifier(name) [PSSpecifier groupSpecifierWithName:name]
@@ -43,3 +46,4 @@
 
 #define setKeyForSpec(key) [specifier setProperty:key forKey:@"key"]
 #define setFooterForSpec(footer) [specifier setProperty:footer forKey:@"footerText"]
+#define setLabelForSpec(label) [specifier setProperty:label forKey:@"label"]

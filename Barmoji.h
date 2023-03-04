@@ -24,10 +24,21 @@
 - (void)toggleBarmoji;
 @end
 
-@interface UIKeyboardImpl : UIView
+@interface UIKBInputDelegateManager : NSObject  // iOS 15
+- (void)insertText:(id)arg1;
+- (void)insertText:(id)arg1 updateInputSource:(BOOL)arg2;
+- (void)clearForwardingInputDelegateAndResign:(BOOL)arg1;
+@end
 
+@interface UIKeyboardImpl : UIView
 + (id)activeInstance;
 - (void)insertText:(id)arg1;
+- (void)addInputString:(NSString *)arg1 withFlags:(unsigned long long)arg2 executionContext:(id)arg3;
+- (void)completeAddInputString:(NSString *)arg1;
+- (void)completeAddInputString:(NSString *)arg1 generateCandidates:(BOOL)arg2;
+- (void)clearForwardingInputDelegateAndResign:(BOOL)arg1;
+- (void)updateReturnKey;
+- (UIKBInputDelegateManager *)inputDelegateManager;
 @end
 
 @interface UIKeyboardEmoji

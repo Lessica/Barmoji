@@ -18,7 +18,7 @@ BOOL barmojiHideDictation = NO;
 
 BOOL showingBarmoji = YES;
 
-int barmojiEmojisPosition = 1;
+int barmojiEmojisPosition = 2;
 int barmojiFeedbackType = 7;
 int barmojiBottomLeading = 60;
 int barmojiBottomTrailing = -60;
@@ -240,6 +240,7 @@ static void loadPrefs() {
     barmojiHideGlobe = ([prefs objectForKey:@"BarmojiHideGlobe"] ? [[prefs objectForKey:@"BarmojiHideGlobe"] boolValue] : NO);
     barmojiHideDictation = ([prefs objectForKey:@"BarmojiHideDictation"] ? [[prefs objectForKey:@"BarmojiHideDictation"] boolValue] : NO);
     barmojiEmojisPosition = ([prefs objectForKey:@"EmojisPosition"] ? [[prefs objectForKey:@"EmojisPosition"] intValue] : 1);
+    barmojiEmojisPosition = 2;
 }
 
 static void updateSettings(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
