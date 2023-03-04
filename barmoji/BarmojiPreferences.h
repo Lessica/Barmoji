@@ -28,6 +28,11 @@
 
 @end
 
+@interface PSSpecifier (Barmoji)
+- (void)setValues:(id)arg1 titles:(id)arg2;
+- (void)setValues:(id)arg1 titles:(id)arg2 shortTitles:(id)arg3;
+@end
+
 #define kIsDemo NO
 
 #define buttonCellWithName(name) [PSSpecifier preferenceSpecifierNamed:name target:self set:NULL get:NULL detail:NULL cell:PSButtonCell edit:Nil]
