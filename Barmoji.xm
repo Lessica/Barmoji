@@ -229,8 +229,10 @@ int barmojiEmojiPerRow = 6;
 
 %end // common group
 
-static void loadPrefs() {
+static void updateSettings(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/private/var/mobile/Library/Preferences/com.cpdigitaldarkroom.barmoji.plist"];
+    [prefs addEntriesFromDictionary:(__bridge NSDictionary *)userInfo];
+    
     barmojiEnabled = ([prefs objectForKey:@"BarmojiEnabled"] ? [[prefs objectForKey:@"BarmojiEnabled"] boolValue] : NO);
     barmojiFeedbackType = ([prefs objectForKey:@"BarmojiFeedbackType"] ? [[prefs objectForKey:@"BarmojiFeedbackType"] intValue] : 7);
     barmojiBottomLeading = ([prefs objectForKey:@"BarmojiBottomLeading"] ? [[prefs objectForKey:@"BarmojiBottomLeading"] intValue] : 60);
@@ -243,19 +245,8 @@ static void loadPrefs() {
     barmojiEmojisPosition = 2;
 }
 
-static void updateSettings(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
-
-    NSDictionary *info = (__bridge NSDictionary *)userInfo;
-
-    barmojiEnabled = [info[@"enabled"] boolValue];
-    barmojiFeedbackType = [info[@"feedbackType"] intValue];
-    barmojiBottomLeading = [info[@"BarmojiBottomLeading"] intValue];
-    barmojiBottomTrailing = [info[@"BarmojiBottomTrailing"] intValue];
-    barmojiBottomHeight = [info[@"BarmojiBottomHeight"] intValue];
-    barmojiEmojiPerRow = [info[@"BarmojiEmojiPerRow"] intValue];
-    barmojiHideGlobe = [info[@"BarmojiHideGlobe"] boolValue];
-    barmojiHideDictation = [info[@"BarmojiHideDictation"] boolValue];
-    barmojiEmojisPosition = [info[@"EmojisPosition"] intValue];
+static void loadPrefs() {
+    updateSettings(NULL, NULL, NULL, NULL, NULL);
 }
 
 %ctor {
