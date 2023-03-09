@@ -10,6 +10,11 @@ Barmoji is available on public repo https://repo.cpdigitaldarkroom.com with the 
 
 ### Changelog
 
+2023.3
+- Changes by Lessica
+- Remove option to use Barmoji in prediction bar
+- Fix crash issues on iOS 15
+
 2020.5
 - Changes by MiRO92
 - Add option to set emojis per row
