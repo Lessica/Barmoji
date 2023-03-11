@@ -249,10 +249,10 @@ static void loadPrefs() {
     updateSettings(NULL, NULL, NULL, NULL, NULL);
 }
 
-%ctor {
-    
-    @autoreleasepool {
-        
+%ctor
+{
+    @autoreleasepool
+    {
         // check if process is springboard or an application
         // this prevents our tweak from running in non-application (with UI)
         // processes and also prevents bad behaving tweaks to invoke our tweak
